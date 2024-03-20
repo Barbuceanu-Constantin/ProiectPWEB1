@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MobyLabWebProgramming.Infrastructure.Database;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    partial class WebAppDatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20240320181522_migrare2_managerId")]
+    partial class migrare2_managerId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,44 +24,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Job", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<float>("Sal_max")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
-                        .HasDefaultValue(0f);
-
-                    b.Property<float>("Sal_min")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
-                        .HasDefaultValue(0f);
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Job");
-
-                    b.HasCheckConstraint("CK_Sal_max_NonNegative", "Sal_max >= 0");
-
-                    b.HasCheckConstraint("CK_Sal_min_NonNegative", "Sal_min >= 0");
-                });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
                 {
@@ -85,9 +49,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<Guid>("JobId")
-                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ManagerId")
                         .HasColumnType("uuid");
@@ -124,8 +85,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("Email");
-
-                    b.HasIndex("JobId");
 
                     b.HasIndex("ManagerId");
 
@@ -174,18 +133,10 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
                 {
-                    b.HasOne("MobyLabWebProgramming.Core.Entities.Job", "Job")
-                        .WithMany("Users")
-                        .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MobyLabWebProgramming.Core.Entities.User", "Manager")
                         .WithMany()
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Job");
 
                     b.Navigation("Manager");
                 });
@@ -199,11 +150,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Job", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>

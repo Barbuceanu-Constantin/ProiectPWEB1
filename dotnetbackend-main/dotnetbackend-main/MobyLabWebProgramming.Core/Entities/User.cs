@@ -10,9 +10,23 @@ public class User : BaseEntity
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string Password { get; set; } = default!;
+    public string PhoneNumber { get; set; } = default!;
+    public string HireDate { get; set; } = default!;
+    public float Salary { get; set; } = default!;
+    public float Commission { get; set; } = default!;
     public UserRoleEnum Role { get; set; } = default!;
 
-    public int Age { get; set; } = default!;
+    //manager_id foreign_key
+    public Guid ManagerId { get; set; }
+    public User Manager { get; set; } = default!;
+
+    //job_id foreign_key
+    public Guid JobId { get; set; }
+    public Job Job { get; set; } = default!;
+
+    //raion_id foreign_key
+    public Guid RaionId { get; set; }
+    public Raion Raion { get; set; } = default!;
 
     /// <summary>
     /// References to other entities such as this are used to automatically fetch correlated data, this is called a navigation property.

@@ -13,11 +13,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.Property(e => e.Id) // This specifies which property is configured.
-            .IsRequired(); // Here it is specified if the property is required, meaning it cannot be null in the database.
-        builder.HasKey(x => x.Id); // Here it is specifies that the property Id is the primary key.
+        builder.Property(e => e.Id)     // This specifies which property is configured.
+            .IsRequired();              // Here it is specified if the property is required, meaning it cannot be null in the database.
+        builder.HasKey(x => x.Id);      // Here it is specifies that the property Id is the primary key.
         builder.Property(e => e.Name)
-            .HasMaxLength(255) // This specifies the maximum length for varchar type in the database.
+            .HasMaxLength(255)          // This specifies the maximum length for varchar type in the database.
             .IsRequired();
         builder.Property(e => e.Email)
             .HasMaxLength(255)
@@ -26,6 +26,44 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.Password)
             .HasMaxLength(255)
             .IsRequired();
+
+        builder.Property(e => e.PhoneNumber)
+            .HasMaxLength(20)
+            .IsRequired();
+        builder.Property(e => e.HireDate)
+            .HasMaxLength(50)
+            .IsRequired();
+        builder.Property(e => e.Salary)
+            .HasColumnType("decimal(18, 2)")
+            .HasDefaultValue(0)
+            .HasPrecision(10, 2)
+            .IsRequired();
+        builder.Property(e => e.Commission)
+            .HasColumnType("decimal(18, 2)")
+            .HasDefaultValue(0)
+            .HasPrecision(10, 2)
+            .IsRequired();
+
+        //Foreign_keys
+        builder.HasOne(u => u.Manager)          //Define navigation property
+               .WithMany()                      // A manager can manage multiple users
+               .HasForeignKey(u => u.ManagerId) // Foreign key property
+               .OnDelete(DeleteBehavior.Cascade)
+               .IsRequired(false);
+
+        builder.HasOne(u => u.Job)              // Define navigation property
+               .WithMany(j => j.Users)          // A job can be assigned to multiple users
+               .HasForeignKey(u => u.JobId)     // Foreign key property
+               .OnDelete(DeleteBehavior.Cascade)
+               .IsRequired(false);
+
+        builder.HasOne(u => u.Raion)              // Define navigation property
+               .WithMany(r => r.Users)          // A job can be assigned to multiple users
+               .HasForeignKey(u => u.Raion)     // Foreign key property
+               .OnDelete(DeleteBehavior.Cascade)
+               .IsRequired(false);
+        //End of foreign keys
+
         builder.Property(e => e.Role)
             .HasMaxLength(255)
             .IsRequired();
@@ -33,5 +71,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
         builder.Property(e => e.UpdatedAt)
             .IsRequired();
+
+        builder.HasCheckConstraint("CK_Salary_NonNegative", "Salary >= 0");
+        builder.HasCheckConstraint("CK_Commission_NonNegative", "Commission >= 0");
     }
 }
