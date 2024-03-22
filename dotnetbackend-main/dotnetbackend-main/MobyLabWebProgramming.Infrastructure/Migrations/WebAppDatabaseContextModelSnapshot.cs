@@ -56,9 +56,42 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.ToTable("Job");
 
-                    b.HasCheckConstraint("CK_Sal_max_NonNegative", "Sal_max >= 0");
+                    b.HasCheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
 
-                    b.HasCheckConstraint("CK_Sal_min_NonNegative", "Sal_min >= 0");
+                    b.HasCheckConstraint("CK_Sal_min_NonNegative", "\"Sal_min\" >= 0");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<Guid>("SefRaionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SefRaionId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Raion");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
@@ -131,9 +164,9 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.ToTable("User");
 
-                    b.HasCheckConstraint("CK_Commission_NonNegative", "Commission >= 0");
+                    b.HasCheckConstraint("CK_Commission_NonNegative", "\"Commission\" >= 0");
 
-                    b.HasCheckConstraint("CK_Salary_NonNegative", "Salary >= 0");
+                    b.HasCheckConstraint("CK_Salary_NonNegative", "\"Salary\" >= 0");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.UserFile", b =>
@@ -172,13 +205,27 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.ToTable("UserFile");
                 });
 
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
+                {
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.User", null)
+                        .WithOne()
+                        .HasForeignKey("MobyLabWebProgramming.Core.Entities.Raion", "SefRaionId");
+
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
                 {
                     b.HasOne("MobyLabWebProgramming.Core.Entities.Job", "Job")
                         .WithMany("Users")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("MobyLabWebProgramming.Core.Entities.User", "Manager")
                         .WithMany()

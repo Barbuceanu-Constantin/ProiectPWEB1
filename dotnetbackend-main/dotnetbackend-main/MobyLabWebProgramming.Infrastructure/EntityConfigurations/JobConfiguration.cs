@@ -25,8 +25,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
             .HasPrecision(10, 2)
             .IsRequired();
 
-        builder.HasCheckConstraint("CK_Sal_min_NonNegative", "Sal_min >= 0");
-        builder.HasCheckConstraint("CK_Sal_max_NonNegative", "Sal_max >= 0");
+        builder.HasCheckConstraint("CK_Sal_min_NonNegative", "\"Sal_min\" >= 0");
+        builder.HasCheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
     }
 }
 

@@ -24,10 +24,6 @@ public class User : BaseEntity
     public Guid JobId { get; set; }
     public Job Job { get; set; } = default!;
 
-    //raion_id foreign_key
-    public Guid RaionId { get; set; }
-    public Raion Raion { get; set; } = default!;
-
     /// <summary>
     /// References to other entities such as this are used to automatically fetch correlated data, this is called a navigation property.
     /// Collection such as this can be used for Many-To-One or Many-To-Many relations.

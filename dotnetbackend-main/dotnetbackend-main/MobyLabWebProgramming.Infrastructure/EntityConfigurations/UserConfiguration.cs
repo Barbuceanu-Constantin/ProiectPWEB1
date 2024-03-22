@@ -56,12 +56,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                .HasForeignKey(u => u.JobId)     // Foreign key property
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired(false);
-
-        builder.HasOne(u => u.Raion)              // Define navigation property
-               .WithMany(r => r.Users)          // A job can be assigned to multiple users
-               .HasForeignKey(u => u.Raion)     // Foreign key property
-               .OnDelete(DeleteBehavior.Cascade)
-               .IsRequired(false);
         //End of foreign keys
 
         builder.Property(e => e.Role)
@@ -72,7 +66,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.UpdatedAt)
             .IsRequired();
 
-        builder.HasCheckConstraint("CK_Salary_NonNegative", "Salary >= 0");
-        builder.HasCheckConstraint("CK_Commission_NonNegative", "Commission >= 0");
+        builder.HasCheckConstraint("CK_Salary_NonNegative", "\"Salary\" >= 0");
+        builder.HasCheckConstraint("CK_Commission_NonNegative", "\"Commission\" >= 0");
     }
 }
