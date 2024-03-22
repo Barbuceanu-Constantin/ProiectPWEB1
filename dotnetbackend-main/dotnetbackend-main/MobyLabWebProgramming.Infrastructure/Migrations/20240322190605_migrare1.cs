@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
-    public partial class migrare1_UserJobOrderProductProviderRaionTables : Migration
+    public partial class migrare1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -60,6 +60,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     Role = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     ManagerId = table.Column<Guid>(type: "uuid", nullable: false),
                     JobId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RaionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -110,7 +111,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     SefRaionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -122,9 +122,23 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         column: x => x.SefRaionId,
                         principalTable: "User",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Receipt",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CashierId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Receipt", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Raion_User_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Receipt_User_CashierId",
+                        column: x => x.CashierId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -187,6 +201,43 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "JoinProviderRaion",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProviderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RaionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinProviderRaion", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JoinProviderRaion_Provider_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "Provider",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinProviderRaion_Raion_RaionId",
+                        column: x => x.RaionId,
+                        principalTable: "Raion",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinProviderRaion_ProviderId",
+                table: "JoinProviderRaion",
+                column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinProviderRaion_RaionId",
+                table: "JoinProviderRaion",
+                column: "RaionId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Order_ClientId",
                 table: "Order",
@@ -209,9 +260,9 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Raion_UserId",
-                table: "Raion",
-                column: "UserId");
+                name: "IX_Receipt_CashierId",
+                table: "Receipt",
+                column: "CashierId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_JobId",
@@ -232,13 +283,19 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "JoinProviderRaion");
+
+            migrationBuilder.DropTable(
                 name: "Product");
 
             migrationBuilder.DropTable(
-                name: "Raion");
+                name: "Receipt");
 
             migrationBuilder.DropTable(
                 name: "UserFile");
+
+            migrationBuilder.DropTable(
+                name: "Raion");
 
             migrationBuilder.DropTable(
                 name: "Order");

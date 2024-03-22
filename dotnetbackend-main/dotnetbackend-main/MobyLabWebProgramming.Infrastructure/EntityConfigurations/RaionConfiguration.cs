@@ -13,9 +13,9 @@ public class RaionConfiguration : IEntityTypeConfiguration<Raion>
         builder.Property(e => e.Name).HasMaxLength(50).IsRequired();
 
         //Foreign_keys  
-        builder.HasOne<User>()                              // Define navigation property
-               .WithOne()                                   // A raion is associated with one user
-               .HasForeignKey<Raion>(r => r.SefRaionId)     // Foreign key property in Raion table
+        builder.HasOne(r => r.User)                 
+               .WithOne(u => u.Raion)
+               .HasForeignKey<Raion>(r => r.SefRaionId)
                .IsRequired(false);
         //End of foreign keys
     }
