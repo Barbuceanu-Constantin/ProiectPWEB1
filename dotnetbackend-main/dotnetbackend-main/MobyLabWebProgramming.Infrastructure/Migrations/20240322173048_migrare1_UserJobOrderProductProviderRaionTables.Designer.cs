@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    [Migration("20240321153113_migrare1_jobAndRaionTables")]
-    partial class migrare1_jobAndRaionTables
+    [Migration("20240322173048_migrare1_UserJobOrderProductProviderRaionTables")]
+    partial class migrare1_UserJobOrderProductProviderRaionTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -36,14 +36,14 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.Property<float>("Sal_max")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasPrecision(17, 2)
+                        .HasColumnType("real")
                         .HasDefaultValue(0f);
 
                     b.Property<float>("Sal_min")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("real")
                         .HasDefaultValue(0f);
 
                     b.Property<string>("Title")
@@ -61,6 +61,111 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasCheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
 
                     b.HasCheckConstraint("CK_Sal_min_NonNegative", "\"Sal_min\" >= 0");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ClientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Price")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(12, 2)
+                        .HasColumnType("real")
+                        .HasDefaultValue(0f);
+
+                    b.Property<Guid>("ProviderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Warranty")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("Product");
+
+                    b.HasCheckConstraint("CK_Pricce_NonNegative", "\"Price\" >= 0");
+
+                    b.HasCheckConstraint("CK_Quantity_NonNegative", "\"Quantity\" >= 0");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Provider", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CountryOfOrigin")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Provider");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
@@ -104,8 +209,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.Property<float>("Commission")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasPrecision(7, 2)
+                        .HasColumnType("real")
                         .HasDefaultValue(0f);
 
                     b.Property<DateTime>("CreatedAt")
@@ -117,7 +222,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("HireDate")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
@@ -138,7 +242,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
@@ -149,8 +252,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.Property<float>("Salary")
                         .ValueGeneratedOnAdd()
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("real")
                         .HasDefaultValue(0f);
 
                     b.Property<DateTime>("UpdatedAt")
@@ -207,6 +310,35 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.ToTable("UserFile");
                 });
 
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Order", b =>
+                {
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.User", "Client")
+                        .WithMany("Orders")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Product", b =>
+                {
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Order", "Order")
+                        .WithMany("Products")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Provider", "Provider")
+                        .WithMany("Products")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Provider");
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
                 {
                     b.HasOne("MobyLabWebProgramming.Core.Entities.User", null)
@@ -255,8 +387,20 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Order", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Provider", b =>
+                {
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
                 {
+                    b.Navigation("Orders");
+
                     b.Navigation("UserFiles");
                 });
 #pragma warning restore 612, 618

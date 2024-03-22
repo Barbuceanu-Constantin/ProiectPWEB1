@@ -29,19 +29,17 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(e => e.PhoneNumber)
             .HasMaxLength(20)
-            .IsRequired();
+            .IsRequired(false);
         builder.Property(e => e.HireDate)
             .HasMaxLength(50)
-            .IsRequired();
+            .IsRequired(false);
         builder.Property(e => e.Salary)
-            .HasColumnType("decimal(18, 2)")
             .HasDefaultValue(0)
-            .HasPrecision(10, 2)
+            .HasPrecision(12, 2)
             .IsRequired();
         builder.Property(e => e.Commission)
-            .HasColumnType("decimal(18, 2)")
             .HasDefaultValue(0)
-            .HasPrecision(10, 2)
+            .HasPrecision(7, 2)
             .IsRequired();
 
         //Foreign_keys

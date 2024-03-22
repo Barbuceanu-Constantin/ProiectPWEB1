@@ -14,15 +14,13 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(e => e.Title).HasMaxLength(50).IsRequired();
 
         builder.Property(e => e.Sal_min)
-            .HasColumnType("decimal(18, 2)")
             .HasDefaultValue(0)
-            .HasPrecision(10, 2)
+            .HasPrecision(5, 2)
             .IsRequired();
 
         builder.Property(e => e.Sal_max)
-            .HasColumnType("decimal(18, 2)")
             .HasDefaultValue(0)
-            .HasPrecision(10, 2)
+            .HasPrecision(17, 2)
             .IsRequired();
 
         builder.HasCheckConstraint("CK_Sal_min_NonNegative", "\"Sal_min\" >= 0");
