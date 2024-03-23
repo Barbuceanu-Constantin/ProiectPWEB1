@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    [Migration("20240322190605_migrare1")]
+    [Migration("20240323102514_migrare1")]
     partial class migrare1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

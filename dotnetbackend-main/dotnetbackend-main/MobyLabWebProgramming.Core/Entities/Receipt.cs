@@ -6,4 +6,6 @@ public class Receipt : BaseEntity
     //provider_id foreign_key
     public Guid CashierId { get; set; }
     public User Cashier { get; set; } = default!;
+
+    public ICollection<Transaction> Transactions { get; set; } = default!;
 }

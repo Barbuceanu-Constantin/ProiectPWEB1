@@ -13,6 +13,7 @@ public sealed class UserRoleEnum : SmartEnum<UserRoleEnum, string>
 {
     public static readonly UserRoleEnum Admin = new(nameof(Admin), "Admin");
     public static readonly UserRoleEnum ManagerRaion = new(nameof(ManagerRaion), "ManagerRaion");
+    public static readonly UserRoleEnum Cashier = new(nameof(Cashier), "Cashier");
     public static readonly UserRoleEnum Client = new(nameof(Client), "Client");
 
     private UserRoleEnum(string name, string value) : base(name, value)
