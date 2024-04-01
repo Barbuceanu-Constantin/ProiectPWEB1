@@ -43,17 +43,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired();
 
         //Foreign_keys
-        builder.HasOne(u => u.Manager)          //Define navigation property
-               .WithMany()                      // A manager can manage multiple users
-               .HasForeignKey(u => u.ManagerId) // Foreign key property
-               .OnDelete(DeleteBehavior.Cascade)
-               .IsRequired(false);
-
         builder.HasOne(u => u.Job)              // Define navigation property
                .WithMany(j => j.Users)          // A job can be assigned to multiple users
                .HasForeignKey(u => u.JobId)     // Foreign key property
                .OnDelete(DeleteBehavior.Cascade)
-               .IsRequired(false);
+               .IsRequired();
         //End of foreign keys
 
         builder.Property(e => e.Role)

@@ -12,6 +12,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.HasKey(x => x.Id);
 
         builder.Property(e => e.Title).HasMaxLength(50).IsRequired();
+        builder.HasAlternateKey(e => e.Title);
 
         builder.Property(e => e.Sal_min)
             .HasDefaultValue(0)

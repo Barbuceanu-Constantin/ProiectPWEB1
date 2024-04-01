@@ -11,4 +11,7 @@ public class UserAddDTO
     public string Email { get; set; } = default!;
     public string Password { get; set; } = default!;
     public UserRoleEnum Role { get; set; } = default!;
+    
+    //eu
+    public Guid JobId { get; set; }
 }

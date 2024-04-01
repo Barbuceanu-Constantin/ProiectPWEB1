@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    [Migration("20240323102514_migrare1")]
-    partial class migrare1
+    [Migration("20240401102717_initial_create")]
+    partial class initial_create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,6 +55,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasAlternateKey("Title");
 
                     b.ToTable("Job");
 
@@ -245,6 +247,38 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.ToTable("Receipt");
                 });
 
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Transaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Quantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<Guid>("ReceiptId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("ReceiptId");
+
+                    b.ToTable("Transaction");
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -270,9 +304,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<Guid>("JobId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ManagerId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -311,8 +342,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasAlternateKey("Email");
 
                     b.HasIndex("JobId");
-
-                    b.HasIndex("ManagerId");
 
                     b.ToTable("User");
 
@@ -425,21 +454,34 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.Navigation("Cashier");
                 });
 
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Transaction", b =>
+                {
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Product", "Product")
+                        .WithMany("Transactions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Receipt", "Receipt")
+                        .WithMany("Transactions")
+                        .HasForeignKey("ReceiptId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Receipt");
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>
                 {
                     b.HasOne("MobyLabWebProgramming.Core.Entities.Job", "Job")
                         .WithMany("Users")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("MobyLabWebProgramming.Core.Entities.User", "Manager")
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Job");
-
-                    b.Navigation("Manager");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.UserFile", b =>
@@ -463,6 +505,11 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Product", b =>
+                {
+                    b.Navigation("Transactions");
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Provider", b =>
                 {
                     b.Navigation("Products");
@@ -473,6 +520,11 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
                 {
                     b.Navigation("Providers");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Receipt", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.User", b =>

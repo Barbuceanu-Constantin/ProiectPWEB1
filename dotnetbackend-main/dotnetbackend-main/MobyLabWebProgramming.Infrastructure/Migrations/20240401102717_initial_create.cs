@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
-    public partial class migrare1 : Migration
+    public partial class initial_create : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,6 +26,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Job", x => x.Id);
+                    table.UniqueConstraint("AK_Job_Title", x => x.Title);
                     table.CheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
                     table.CheckConstraint("CK_Sal_min_NonNegative", "\"Sal_min\" >= 0");
                 });
@@ -58,7 +59,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     Salary = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
                     Commission = table.Column<float>(type: "real", precision: 7, scale: 2, nullable: false, defaultValue: 0f),
                     Role = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ManagerId = table.Column<Guid>(type: "uuid", nullable: false),
                     JobId = table.Column<Guid>(type: "uuid", nullable: false),
                     RaionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -74,12 +74,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         name: "FK_User_Job_JobId",
                         column: x => x.JobId,
                         principalTable: "Job",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_User_User_ManagerId",
-                        column: x => x.ManagerId,
-                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -228,6 +222,34 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Transaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    ReceiptId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Receipt_ReceiptId",
+                        column: x => x.ReceiptId,
+                        principalTable: "Receipt",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_JoinProviderRaion_ProviderId",
                 table: "JoinProviderRaion",
@@ -265,14 +287,19 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 column: "CashierId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Transaction_ProductId",
+                table: "Transaction",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_ReceiptId",
+                table: "Transaction",
+                column: "ReceiptId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_User_JobId",
                 table: "User",
                 column: "JobId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_User_ManagerId",
-                table: "User",
-                column: "ManagerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserFile_UserId",
@@ -286,16 +313,19 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 name: "JoinProviderRaion");
 
             migrationBuilder.DropTable(
-                name: "Product");
-
-            migrationBuilder.DropTable(
-                name: "Receipt");
+                name: "Transaction");
 
             migrationBuilder.DropTable(
                 name: "UserFile");
 
             migrationBuilder.DropTable(
                 name: "Raion");
+
+            migrationBuilder.DropTable(
+                name: "Product");
+
+            migrationBuilder.DropTable(
+                name: "Receipt");
 
             migrationBuilder.DropTable(
                 name: "Order");

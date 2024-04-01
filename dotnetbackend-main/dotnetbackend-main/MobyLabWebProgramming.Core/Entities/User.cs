@@ -16,16 +16,12 @@ public class User : BaseEntity
     public float Commission { get; set; } = default!;
     public UserRoleEnum Role { get; set; } = default!;
 
-    //manager_id foreign_key
-    public Guid ManagerId { get; set; }
-    public User Manager { get; set; } = default!;
-
     //job_id foreign_key
-    public Guid JobId { get; set; }
+    public Guid JobId { get; set; } = default!;
     public Job Job { get; set; } = default!;
 
     //raion_id foreign_key
-    public Guid RaionId { get; set; }
+    public Guid RaionId { get; set; } = default!;
     public Raion Raion { get; set; } = default!;
 
 

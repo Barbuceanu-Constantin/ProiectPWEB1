@@ -54,6 +54,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasAlternateKey("Title");
+
                     b.ToTable("Job");
 
                     b.HasCheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
@@ -302,9 +304,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.Property<Guid>("JobId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ManagerId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -341,8 +340,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasAlternateKey("Email");
 
                     b.HasIndex("JobId");
-
-                    b.HasIndex("ManagerId");
 
                     b.ToTable("User");
 
@@ -479,16 +476,10 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasOne("MobyLabWebProgramming.Core.Entities.Job", "Job")
                         .WithMany("Users")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("MobyLabWebProgramming.Core.Entities.User", "Manager")
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Job");
-
-                    b.Navigation("Manager");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.UserFile", b =>
