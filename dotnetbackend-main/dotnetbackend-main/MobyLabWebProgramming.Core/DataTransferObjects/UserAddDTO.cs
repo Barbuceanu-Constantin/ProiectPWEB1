@@ -14,4 +14,5 @@ public class UserAddDTO
     
     //eu
     public Guid JobId { get; set; }
+    public Guid UserId { get; set; }
 }

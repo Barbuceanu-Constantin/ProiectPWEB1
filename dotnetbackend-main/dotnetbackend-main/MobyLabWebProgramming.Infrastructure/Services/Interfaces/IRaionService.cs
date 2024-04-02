@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MobyLabWebProgramming.Core.DataTransferObjects;
+using MobyLabWebProgramming.Core.Requests;
+using MobyLabWebProgramming.Core.Responses;
 
-namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
+namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
+
+public interface IRaionService
 {
-    internal class IRaionService
-    {
-    }
+    public Task<ServiceResponse<JobDTO>> GetRaion(Guid id, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse<PagedResponse<RaionDTO>>> GetRaioane(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> AddRaion(RaionDTO raion, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> UpdateRaion(RaionDTO raion, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> DeleteRaion(Guid id, CancellationToken cancellationToken = default);
 }
+

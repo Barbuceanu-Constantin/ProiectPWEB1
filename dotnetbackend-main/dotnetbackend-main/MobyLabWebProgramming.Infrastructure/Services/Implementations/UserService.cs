@@ -94,6 +94,7 @@ public class UserService : IUserService
 
         await _repository.AddAsync(new User
         {
+            Id = user.UserId,
             Email = user.Email,
             Name = user.Name,
             Role = user.Role,

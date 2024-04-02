@@ -34,6 +34,12 @@ public class InitializerWorker : BackgroundService
             //Eu
             await using var scope2 = _serviceProvider.CreateAsyncScope();
             var jobService = scope2.ServiceProvider.GetService<IJobService>();
+
+            await using var scope3 = _serviceProvider.CreateAsyncScope();
+            var providerService = scope3.ServiceProvider.GetService<IProviderService>();
+
+            await using var scope4 = _serviceProvider.CreateAsyncScope();
+            var raionService = scope4.ServiceProvider.GetService<IRaionService>();
             //
 
             if (userService == null)
@@ -51,14 +57,19 @@ public class InitializerWorker : BackgroundService
                 return;
             }
 
-            await jobService.AddJob(new()
+            if (raionService == null)
             {
-                Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
-                Title = "Admin",
-                Sal_min = 10000,
-                Sal_max = 20000
+                _logger.LogInformation("Couldn't add null raion!");
+
+                return;
             }
-            );
+
+            if (providerService == null)
+            {
+                _logger.LogInformation("Couldn't add null provider!");
+
+                return;
+            }
             //Cod adaugat de mine
 
             var count = await userService.GetUserCount(cancellationToken);
@@ -67,15 +78,163 @@ public class InitializerWorker : BackgroundService
             {
                 _logger.LogInformation("No user found, adding default user!");
 
+                /////////////////////////////////////////////
+                await jobService.AddJob(new()
+                {
+                    Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
+                    Title = "Admin",
+                    Sal_min = 10000,
+                    Sal_max = 20000
+                }
+                );
 
+                await jobService.AddJob(new()
+                {
+                    Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
+                    Title = "ManagerRaion",
+                    Sal_min = 5000,
+                    Sal_max = 150000
+                }
+                );
+                /////////////////////////////////////////////
+
+
+
+                /////////////////////////////////////////////
                 await userService.AddUser(new()
                 {
+                    UserId = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
                     Email = "admin@default.com",
                     Name = "Admin",
                     Role = UserRoleEnum.Admin,
                     Password = PasswordUtils.HashPassword("default"),
                     JobId = new Guid("00000001-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
+
+                await userService.AddUser(new()
+                {
+                    UserId = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
+                    Email = "manager1@default.com",
+                    Name = "manager1",
+                    Role = UserRoleEnum.Admin,
+                    Password = PasswordUtils.HashPassword("manager1"),
+                    JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await userService.AddUser(new()
+                {
+                    UserId = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
+                    Email = "manager2@default.com",
+                    Name = "manager2",
+                    Role = UserRoleEnum.Admin,
+                    Password = PasswordUtils.HashPassword("manager2"),
+                    JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await userService.AddUser(new()
+                {
+                    UserId = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
+                    Email = "manager3@default.com",
+                    Name = "manager3",
+                    Role = UserRoleEnum.Admin,
+                    Password = PasswordUtils.HashPassword("manager3"),
+                    JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await userService.AddUser(new()
+                {
+                    UserId = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
+                    Email = "manager4@default.com",
+                    Name = "manager4",
+                    Role = UserRoleEnum.Admin,
+                    Password = PasswordUtils.HashPassword("manager4"),
+                    JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await userService.AddUser(new()
+                {
+                    UserId = new Guid("00000006-0000-0000-0000-000000000000".ToString()),
+                    Email = "manager5@default.com",
+                    Name = "manager5",
+                    Role = UserRoleEnum.Admin,
+                    Password = PasswordUtils.HashPassword("manager5"),
+                    JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+                /////////////////////////////////////////////
+
+                /////////////////////////////////////////////
+                await raionService.AddRaion(new()
+                {
+                    Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
+                    Name = "Gradina",
+                    SefRaionId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await raionService.AddRaion(new()
+                {
+                    Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
+                    Name = "Bucatarie",
+                    SefRaionId = new Guid("00000003-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await raionService.AddRaion(new()
+                {
+                    Id = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
+                    Name = "Electrocasnice",
+                    SefRaionId = new Guid("00000004-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await raionService.AddRaion(new()
+                {
+                    Id = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
+                    Name = "Scule si unelte",
+                    SefRaionId = new Guid("00000005-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+
+                await raionService.AddRaion(new()
+                {
+                    Id = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
+                    Name = "Auto",
+                    SefRaionId = new Guid("00000006-0000-0000-0000-000000000000".ToString())
+                }, cancellationToken: cancellationToken);
+                /////////////////////////////////////////////
+
+                /////////////////////////////////////////////
+                await providerService.AddProvider(new()
+                {
+                    Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
+                    Name = "Gardena",
+                    CountryOfOrigin = "Romania"
+                }, cancellationToken: cancellationToken);
+
+                await providerService.AddProvider(new()
+                {
+                    Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
+                    Name = "Husqvarna",
+                    CountryOfOrigin = "Suedia"
+                }, cancellationToken: cancellationToken);
+
+                await providerService.AddProvider(new()
+                {
+                    Id = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
+                    Name = "Phillips",
+                    CountryOfOrigin = "Olanda"
+                }, cancellationToken: cancellationToken);
+
+                await providerService.AddProvider(new()
+                {
+                    Id = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
+                    Name = "Kotarbau",
+                    CountryOfOrigin = "Suedia"
+                }, cancellationToken: cancellationToken);
+
+                await providerService.AddProvider(new()
+                {
+                    Id = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
+                    Name = "Zanussi",
+                    CountryOfOrigin = "Italia"
+                }, cancellationToken: cancellationToken);
+                /////////////////////////////////////////////
             }
         }
         catch (Exception ex)
