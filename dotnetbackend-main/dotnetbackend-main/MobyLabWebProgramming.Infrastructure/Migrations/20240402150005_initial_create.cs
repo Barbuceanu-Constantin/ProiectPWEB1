@@ -196,27 +196,24 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "JoinProviderRaion",
+                name: "ProviderRaion",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProviderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RaionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    ProvidersId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RaioaneId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JoinProviderRaion", x => x.Id);
+                    table.PrimaryKey("PK_ProviderRaion", x => new { x.ProvidersId, x.RaioaneId });
                     table.ForeignKey(
-                        name: "FK_JoinProviderRaion_Provider_ProviderId",
-                        column: x => x.ProviderId,
+                        name: "FK_ProviderRaion_Provider_ProvidersId",
+                        column: x => x.ProvidersId,
                         principalTable: "Provider",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_JoinProviderRaion_Raion_RaionId",
-                        column: x => x.RaionId,
+                        name: "FK_ProviderRaion_Raion_RaioaneId",
+                        column: x => x.RaioaneId,
                         principalTable: "Raion",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -251,16 +248,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_JoinProviderRaion_ProviderId",
-                table: "JoinProviderRaion",
-                column: "ProviderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_JoinProviderRaion_RaionId",
-                table: "JoinProviderRaion",
-                column: "RaionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Order_ClientId",
                 table: "Order",
                 column: "ClientId");
@@ -274,6 +261,11 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 name: "IX_Product_ProviderId",
                 table: "Product",
                 column: "ProviderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProviderRaion_RaioaneId",
+                table: "ProviderRaion",
+                column: "RaioaneId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Raion_SefRaionId",
@@ -310,7 +302,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "JoinProviderRaion");
+                name: "ProviderRaion");
 
             migrationBuilder.DropTable(
                 name: "Transaction");

@@ -64,7 +64,8 @@ public class UserService : IUserService
             Id = result.Id,
             Email = result.Email,
             Name = result.Name,
-            Role = result.Role
+            Role = result.Role,
+            JobId = result.JobId //adaugat de mine
         };
 
         return ServiceResponse<LoginResponseDTO>.ForSuccess(new()

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    [Migration("20240401102717_initial_create")]
+    [Migration("20240402150005_initial_create")]
     partial class initial_create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,33 +63,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasCheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
 
                     b.HasCheckConstraint("CK_Sal_min_NonNegative", "\"Sal_min\" >= 0");
-                });
-
-            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.JoinProviderRaion", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("RaionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProviderId");
-
-                    b.HasIndex("RaionId");
-
-                    b.ToTable("JoinProviderRaion");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Order", b =>
@@ -386,23 +359,19 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.ToTable("UserFile");
                 });
 
-            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.JoinProviderRaion", b =>
+            modelBuilder.Entity("ProviderRaion", b =>
                 {
-                    b.HasOne("MobyLabWebProgramming.Core.Entities.Provider", "Provider")
-                        .WithMany("Raioane")
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("ProvidersId")
+                        .HasColumnType("uuid");
 
-                    b.HasOne("MobyLabWebProgramming.Core.Entities.Raion", "Raion")
-                        .WithMany("Providers")
-                        .HasForeignKey("RaionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<Guid>("RaioaneId")
+                        .HasColumnType("uuid");
 
-                    b.Navigation("Provider");
+                    b.HasKey("ProvidersId", "RaioaneId");
 
-                    b.Navigation("Raion");
+                    b.HasIndex("RaioaneId");
+
+                    b.ToTable("ProviderRaion");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Order", b =>
@@ -495,6 +464,21 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProviderRaion", b =>
+                {
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Provider", null)
+                        .WithMany()
+                        .HasForeignKey("ProvidersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Raion", null)
+                        .WithMany()
+                        .HasForeignKey("RaioaneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Job", b =>
                 {
                     b.Navigation("Users");
@@ -513,13 +497,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Provider", b =>
                 {
                     b.Navigation("Products");
-
-                    b.Navigation("Raioane");
-                });
-
-            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
-                {
-                    b.Navigation("Providers");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Receipt", b =>

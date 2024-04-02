@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using MobyLabWebProgramming.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
