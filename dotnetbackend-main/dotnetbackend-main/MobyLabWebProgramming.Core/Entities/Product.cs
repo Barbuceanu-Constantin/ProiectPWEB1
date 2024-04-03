@@ -12,9 +12,6 @@ public class Product : BaseEntity
     //provider_id foreign_key
     public Guid ProviderId { get; set; }
     public Provider Provider { get; set; } = default!;
-    //command_id foreign_key
-    public Guid OrderId { get; set; }
-    public Order Order { get; set; } = default!;
 
     public ICollection<Transaction> Transactions { get; set; } = default!;
 }

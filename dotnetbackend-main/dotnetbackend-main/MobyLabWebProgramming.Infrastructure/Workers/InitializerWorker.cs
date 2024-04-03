@@ -116,7 +116,7 @@ public class InitializerWorker : BackgroundService
                     UserId = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
                     Email = "manager1@default.com",
                     Name = "manager1",
-                    Role = UserRoleEnum.Admin,
+                    Role = UserRoleEnum.ManagerRaion,
                     Password = PasswordUtils.HashPassword("manager1"),
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
@@ -126,7 +126,7 @@ public class InitializerWorker : BackgroundService
                     UserId = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
                     Email = "manager2@default.com",
                     Name = "manager2",
-                    Role = UserRoleEnum.Admin,
+                    Role = UserRoleEnum.ManagerRaion,
                     Password = PasswordUtils.HashPassword("manager2"),
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
@@ -136,7 +136,7 @@ public class InitializerWorker : BackgroundService
                     UserId = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
                     Email = "manager3@default.com",
                     Name = "manager3",
-                    Role = UserRoleEnum.Admin,
+                    Role = UserRoleEnum.ManagerRaion,
                     Password = PasswordUtils.HashPassword("manager3"),
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
@@ -146,7 +146,7 @@ public class InitializerWorker : BackgroundService
                     UserId = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
                     Email = "manager4@default.com",
                     Name = "manager4",
-                    Role = UserRoleEnum.Admin,
+                    Role = UserRoleEnum.ManagerRaion,
                     Password = PasswordUtils.HashPassword("manager4"),
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
@@ -156,42 +156,42 @@ public class InitializerWorker : BackgroundService
                     UserId = new Guid("00000006-0000-0000-0000-000000000000".ToString()),
                     Email = "manager5@default.com",
                     Name = "manager5",
-                    Role = UserRoleEnum.Admin,
+                    Role = UserRoleEnum.ManagerRaion,
                     Password = PasswordUtils.HashPassword("manager5"),
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
                 /////////////////////////////////////////////
 
                 /////////////////////////////////////////////
-                await raionService.AddRaion(new()
+                await raionService.AddRaionInit(new()
                 {
                     Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
                     Name = "Gradina",
                     SefRaionId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await raionService.AddRaion(new()
+                await raionService.AddRaionInit(new()
                 {
                     Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
                     Name = "Bucatarie",
                     SefRaionId = new Guid("00000003-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await raionService.AddRaion(new()
+                await raionService.AddRaionInit(new()
                 {
                     Id = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
                     Name = "Electrocasnice",
                     SefRaionId = new Guid("00000004-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await raionService.AddRaion(new()
+                await raionService.AddRaionInit(new()
                 {
                     Id = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
                     Name = "Scule si unelte",
                     SefRaionId = new Guid("00000005-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await raionService.AddRaion(new()
+                await raionService.AddRaionInit(new()
                 {
                     Id = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
                     Name = "Auto",

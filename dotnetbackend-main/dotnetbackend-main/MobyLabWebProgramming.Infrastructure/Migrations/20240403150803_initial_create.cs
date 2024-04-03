@@ -60,7 +60,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     Commission = table.Column<float>(type: "real", precision: 7, scale: 2, nullable: false, defaultValue: 0f),
                     Role = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     JobId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RaionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -79,11 +78,39 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Product",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Warranty = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Price = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
+                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    ProviderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.CheckConstraint("CK_Pricce_NonNegative", "\"Price\" >= 0");
+                    table.CheckConstraint("CK_Quantity_NonNegative", "\"Quantity\" >= 0");
+                    table.ForeignKey(
+                        name: "FK_Product_Provider_ProviderId",
+                        column: x => x.ProviderId,
+                        principalTable: "Provider",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Order",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ClientId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PaymentId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -115,25 +142,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         name: "FK_Raion_User_SefRaionId",
                         column: x => x.SefRaionId,
                         principalTable: "User",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Receipt",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    CashierId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Receipt", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Receipt_User_CashierId",
-                        column: x => x.CashierId,
-                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -162,35 +170,51 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
+                name: "Payment",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    Warranty = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    Price = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
-                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    ProviderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    TotalPrice = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Product", x => x.Id);
-                    table.CheckConstraint("CK_Pricce_NonNegative", "\"Price\" >= 0");
-                    table.CheckConstraint("CK_Quantity_NonNegative", "\"Quantity\" >= 0");
+                    table.PrimaryKey("PK_Payment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Product_Order_OrderId",
+                        name: "FK_Payment_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Order_OrderId",
                         column: x => x.OrderId,
                         principalTable: "Order",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Product_Provider_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "Provider",
+                        name: "FK_Transaction_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -219,43 +243,16 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Transaction",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    ReceiptId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Transaction", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Transaction_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Transaction_Receipt_ReceiptId",
-                        column: x => x.ReceiptId,
-                        principalTable: "Receipt",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Order_ClientId",
                 table: "Order",
                 column: "ClientId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_OrderId",
-                table: "Product",
-                column: "OrderId");
+                name: "IX_Payment_OrderId",
+                table: "Payment",
+                column: "OrderId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_ProviderId",
@@ -270,23 +267,17 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Raion_SefRaionId",
                 table: "Raion",
-                column: "SefRaionId",
-                unique: true);
+                column: "SefRaionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Receipt_CashierId",
-                table: "Receipt",
-                column: "CashierId");
+                name: "IX_Transaction_OrderId",
+                table: "Transaction",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transaction_ProductId",
                 table: "Transaction",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Transaction_ReceiptId",
-                table: "Transaction",
-                column: "ReceiptId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_JobId",
@@ -302,6 +293,9 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Payment");
+
+            migrationBuilder.DropTable(
                 name: "ProviderRaion");
 
             migrationBuilder.DropTable(
@@ -314,19 +308,16 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 name: "Raion");
 
             migrationBuilder.DropTable(
-                name: "Product");
-
-            migrationBuilder.DropTable(
-                name: "Receipt");
-
-            migrationBuilder.DropTable(
                 name: "Order");
 
             migrationBuilder.DropTable(
-                name: "Provider");
+                name: "Product");
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Provider");
 
             migrationBuilder.DropTable(
                 name: "Job");

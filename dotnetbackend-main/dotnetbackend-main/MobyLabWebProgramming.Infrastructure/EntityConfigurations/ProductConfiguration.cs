@@ -41,12 +41,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                .HasForeignKey(p => p.ProviderId)
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired();
-
-        builder.HasOne(p => p.Order)
-               .WithMany(c => c.Products)
-               .HasForeignKey(c => c.OrderId)
-               .OnDelete(DeleteBehavior.Cascade)
-               .IsRequired(false);
         //End of foreign keys
 
         builder.HasCheckConstraint("CK_Pricce_NonNegative", "\"Price\" >= 0");

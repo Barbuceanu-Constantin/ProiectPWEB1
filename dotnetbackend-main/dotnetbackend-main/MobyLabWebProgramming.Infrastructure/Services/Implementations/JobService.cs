@@ -34,7 +34,7 @@ public class JobService : IJobService
 
         return result != null ?
             ServiceResponse<JobDTO>.ForSuccess(result) :
-            ServiceResponse<JobDTO>.FromError(CommonErrors.JobNotFound); // Pack the result or error into a ServiceResponse.
+            ServiceResponse<JobDTO>.FromError(CommonErrors.JobFailAdd); // Pack the result or error into a ServiceResponse.
     }
     /// <summary>
     /// GetJobs returns page with job information from the database.

@@ -13,10 +13,11 @@ public class RaionConfiguration : IEntityTypeConfiguration<Raion>
         builder.Property(e => e.Name).HasMaxLength(50).IsRequired();
 
         //Foreign_keys  
-        builder.HasOne(r => r.User)                 
-               .WithOne(u => u.Raion)
-               .HasForeignKey<Raion>(r => r.SefRaionId)
-               .IsRequired(false);
+        builder.HasOne(r => r.User)
+               .WithMany(u => u.Raioane)
+               .HasForeignKey(r => r.SefRaionId)
+               .OnDelete(DeleteBehavior.Cascade)
+               .IsRequired();
         //End of foreign keys
     }
 }

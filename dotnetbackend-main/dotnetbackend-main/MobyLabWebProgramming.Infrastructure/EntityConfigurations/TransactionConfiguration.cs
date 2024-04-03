@@ -22,9 +22,9 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired();
 
-        builder.HasOne(t => t.Receipt)
-               .WithMany(r => r.Transactions)
-               .HasForeignKey(t => t.ReceiptId)
+        builder.HasOne(t => t.Order)
+               .WithMany(p => p.Transactions)
+               .HasForeignKey(t => t.OrderId)
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired();
         //End of foreign keys
