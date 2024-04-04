@@ -10,8 +10,8 @@ public class Product : BaseEntity
     public int Quantity { get; set; } = default!;
     
     //provider_id foreign_key
-    public Guid ProviderId { get; set; }
-    public Provider Provider { get; set; } = default!;
+    public Guid RaionId { get; set; }
+    public Raion Raion { get; set; } = default!;
 
     public ICollection<Transaction> Transactions { get; set; } = default!;
 }

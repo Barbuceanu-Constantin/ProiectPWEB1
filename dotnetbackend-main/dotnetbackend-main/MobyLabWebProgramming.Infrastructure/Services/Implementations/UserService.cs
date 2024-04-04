@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics.Metrics;
+using System.Net;
 using MobyLabWebProgramming.Core.Constants;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
@@ -8,6 +9,7 @@ using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Core.Specifications;
 using MobyLabWebProgramming.Infrastructure.Database;
+using MobyLabWebProgramming.Infrastructure.Repositories.Implementation;
 using MobyLabWebProgramming.Infrastructure.Repositories.Interfaces;
 using MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 
@@ -18,7 +20,7 @@ public class UserService : IUserService
     private readonly IRepository<WebAppDatabaseContext> _repository;
     private readonly ILoginService _loginService;
     private readonly IMailService _mailService;
-
+    private static int counter = 0;
     /// <summary>
     /// Inject the required services through the constructor.
     /// </summary>
@@ -78,7 +80,7 @@ public class UserService : IUserService
     public async Task<ServiceResponse<int>> GetUserCount(CancellationToken cancellationToken = default) => 
         ServiceResponse<int>.ForSuccess(await _repository.GetCountAsync<User>(cancellationToken)); // Get the count of all user entities in the database.
 
-    public async Task<ServiceResponse> AddUser(UserAddDTO user, UserDTO? requestingUser, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> AddStaffUser(UserAddStaffDTO user, UserDTO? requestingUser, CancellationToken cancellationToken = default)
     {
         if (requestingUser != null && requestingUser.Role != UserRoleEnum.Admin) // Verify who can add the user, you can change this however you se fit.
         {
@@ -92,15 +94,76 @@ public class UserService : IUserService
             return ServiceResponse.FromError(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
         }
 
+        ////////////////////////////////////////////////////////////////////////
+        // Convert the integer to a byte array
+        byte[] bytes = BitConverter.GetBytes(counter + 1);
+
+        // Pad the byte array to ensure it's 16 bytes long (required for GUID)
+        byte[] paddedBytes = new byte[16];
+        Array.Copy(bytes, paddedBytes, Math.Min(bytes.Length, 16));
+
+        // Create a new GUID using the byte array
+        Guid guidValue = new Guid(paddedBytes);
+        ////////////////////////////////////////////////////////////////////////
+
         await _repository.AddAsync(new User
         {
-            Id = user.UserId,
+            Id = guidValue,
             Email = user.Email,
             Name = user.Name,
             Role = user.Role,
             Password = user.Password,
-            JobId = user.JobId  //adaugat de mine
+            JobId = user.JobId,  //adaugat de mine
+            PhoneNumber = user.PhoneNumber,
+            HireDate = user.HireDate,
+            Salary = user.Salary,
+            Commission = user.Commission
         }, cancellationToken); // A new entity is created and persisted in the database.
+
+        counter++;
+        
+        await _mailService.SendMail(user.Email, "Welcome!", MailTemplates.UserAddTemplate(user.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
+
+        return ServiceResponse.ForSuccess();
+    }
+
+    public async Task<ServiceResponse> AddClientUser(UserAddClientDTO user, UserDTO? requestingUser, CancellationToken cancellationToken = default)
+    {
+        if (requestingUser != null && requestingUser.Role != UserRoleEnum.Admin) // Verify who can add the user, you can change this however you se fit.
+        {
+            return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Only the admin can add users!", ErrorCodes.CannotAdd));
+        }
+
+        var result = await _repository.GetAsync(new UserSpec(user.Email), cancellationToken);
+
+        if (result != null)
+        {
+            return ServiceResponse.FromError(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Convert the integer to a byte array
+        byte[] bytes = BitConverter.GetBytes(counter + 1);
+
+        // Pad the byte array to ensure it's 16 bytes long (required for GUID)
+        byte[] paddedBytes = new byte[16];
+        Array.Copy(bytes, paddedBytes, Math.Min(bytes.Length, 16));
+
+        // Create a new GUID using the byte array
+        Guid guidValue = new Guid(paddedBytes);
+        ////////////////////////////////////////////////////////////////////////
+
+        await _repository.AddAsync(new User
+        {
+            Id = guidValue,
+            Email = user.Email,
+            Name = user.Name,
+            Role = user.Role,
+            Password = user.Password,
+            JobId = new Guid("00000001-0000-0000-0000-000000000000")
+        }, cancellationToken); // A new entity is created and persisted in the database.
+
+        counter += 1;
 
         await _mailService.SendMail(user.Email, "Welcome!", MailTemplates.UserAddTemplate(user.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
 

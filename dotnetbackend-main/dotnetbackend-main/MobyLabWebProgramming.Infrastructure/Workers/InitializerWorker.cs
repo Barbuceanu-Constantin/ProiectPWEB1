@@ -82,6 +82,15 @@ public class InitializerWorker : BackgroundService
                 await jobService.AddJob(new()
                 {
                     Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
+                    Title = "JobVid",
+                    Sal_min = 0,
+                    Sal_max = 0
+                }
+                );
+
+                await jobService.AddJob(new()
+                {
+                    Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
                     Title = "Admin",
                     Sal_min = 10000,
                     Sal_max = 20000
@@ -90,7 +99,7 @@ public class InitializerWorker : BackgroundService
 
                 await jobService.AddJob(new()
                 {
-                    Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
+                    Id = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
                     Title = "ManagerRaion",
                     Sal_min = 5000,
                     Sal_max = 150000
@@ -98,12 +107,9 @@ public class InitializerWorker : BackgroundService
                 );
                 /////////////////////////////////////////////
 
-
-
                 /////////////////////////////////////////////
-                await userService.AddUser(new()
+                await userService.AddStaffUser(new()
                 {
-                    UserId = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
                     Email = "admin@default.com",
                     Name = "Admin",
                     Role = UserRoleEnum.Admin,
@@ -111,9 +117,8 @@ public class InitializerWorker : BackgroundService
                     JobId = new Guid("00000001-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await userService.AddUser(new()
+                await userService.AddStaffUser(new()
                 {
-                    UserId = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
                     Email = "manager1@default.com",
                     Name = "manager1",
                     Role = UserRoleEnum.ManagerRaion,
@@ -121,9 +126,8 @@ public class InitializerWorker : BackgroundService
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await userService.AddUser(new()
+                await userService.AddStaffUser(new()
                 {
-                    UserId = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
                     Email = "manager2@default.com",
                     Name = "manager2",
                     Role = UserRoleEnum.ManagerRaion,
@@ -131,9 +135,8 @@ public class InitializerWorker : BackgroundService
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await userService.AddUser(new()
+                await userService.AddStaffUser(new()
                 {
-                    UserId = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
                     Email = "manager3@default.com",
                     Name = "manager3",
                     Role = UserRoleEnum.ManagerRaion,
@@ -141,9 +144,8 @@ public class InitializerWorker : BackgroundService
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await userService.AddUser(new()
+                await userService.AddStaffUser(new()
                 {
-                    UserId = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
                     Email = "manager4@default.com",
                     Name = "manager4",
                     Role = UserRoleEnum.ManagerRaion,
@@ -151,9 +153,8 @@ public class InitializerWorker : BackgroundService
                     JobId = new Guid("00000002-0000-0000-0000-000000000000".ToString())
                 }, cancellationToken: cancellationToken);
 
-                await userService.AddUser(new()
+                await userService.AddStaffUser(new()
                 {
-                    UserId = new Guid("00000006-0000-0000-0000-000000000000".ToString()),
                     Email = "manager5@default.com",
                     Name = "manager5",
                     Role = UserRoleEnum.ManagerRaion,

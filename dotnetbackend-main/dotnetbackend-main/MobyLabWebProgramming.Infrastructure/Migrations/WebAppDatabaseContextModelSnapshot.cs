@@ -145,13 +145,13 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("real")
                         .HasDefaultValue(0f);
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
+
+                    b.Property<Guid>("RaionId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -163,7 +163,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("RaionId");
 
                     b.ToTable("Product");
 
@@ -401,13 +401,13 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Product", b =>
                 {
-                    b.HasOne("MobyLabWebProgramming.Core.Entities.Provider", "Provider")
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Raion", "Raion")
                         .WithMany("Products")
-                        .HasForeignKey("ProviderId")
+                        .HasForeignKey("RaionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Provider");
+                    b.Navigation("Raion");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
@@ -445,8 +445,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.HasOne("MobyLabWebProgramming.Core.Entities.Job", "Job")
                         .WithMany("Users")
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Job");
                 });
@@ -495,7 +494,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Provider", b =>
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>
                 {
                     b.Navigation("Products");
                 });

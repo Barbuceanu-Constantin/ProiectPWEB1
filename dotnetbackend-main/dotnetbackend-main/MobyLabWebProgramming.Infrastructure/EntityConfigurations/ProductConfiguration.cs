@@ -36,9 +36,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired();
 
         //Foreign_keys
-        builder.HasOne(p => p.Provider)
-               .WithMany(p => p.Products)
-               .HasForeignKey(p => p.ProviderId)
+        builder.HasOne(p => p.Raion)
+               .WithMany(r => r.Products)
+               .HasForeignKey(p => p.RaionId)
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired();
         //End of foreign keys

@@ -47,7 +47,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                .WithMany(j => j.Users)          // A job can be assigned to multiple users
                .HasForeignKey(u => u.JobId)     // Foreign key property
                .OnDelete(DeleteBehavior.Cascade)
-               .IsRequired();
+               .IsRequired(false);
         //End of foreign keys
 
         builder.Property(e => e.Role)

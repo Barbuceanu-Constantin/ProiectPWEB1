@@ -78,33 +78,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Product",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    Warranty = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    Price = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
-                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    ProviderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Product", x => x.Id);
-                    table.CheckConstraint("CK_Pricce_NonNegative", "\"Price\" >= 0");
-                    table.CheckConstraint("CK_Quantity_NonNegative", "\"Quantity\" >= 0");
-                    table.ForeignKey(
-                        name: "FK_Product_Provider_ProviderId",
-                        column: x => x.ProviderId,
-                        principalTable: "Provider",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Order",
                 columns: table => new
                 {
@@ -192,29 +165,28 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transaction",
+                name: "Product",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Warranty = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Price = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
                     Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RaionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                    table.PrimaryKey("PK_Product", x => x.Id);
+                    table.CheckConstraint("CK_Pricce_NonNegative", "\"Price\" >= 0");
+                    table.CheckConstraint("CK_Quantity_NonNegative", "\"Quantity\" >= 0");
                     table.ForeignKey(
-                        name: "FK_Transaction_Order_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Order",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Transaction_Product_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Product",
+                        name: "FK_Product_Raion_RaionId",
+                        column: x => x.RaionId,
+                        principalTable: "Raion",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -243,6 +215,34 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Transaction",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Order_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Order",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transaction_Product_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Order_ClientId",
                 table: "Order",
@@ -255,9 +255,9 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_ProviderId",
+                name: "IX_Product_RaionId",
                 table: "Product",
-                column: "ProviderId");
+                column: "RaionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProviderRaion_RaioaneId",
@@ -305,7 +305,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 name: "UserFile");
 
             migrationBuilder.DropTable(
-                name: "Raion");
+                name: "Provider");
 
             migrationBuilder.DropTable(
                 name: "Order");
@@ -314,10 +314,10 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 name: "Product");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Raion");
 
             migrationBuilder.DropTable(
-                name: "Provider");
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Job");
