@@ -8,7 +8,9 @@ public interface IProviderService
 {
     public Task<ServiceResponse<ProviderDTO>> GetProvider(Guid id, CancellationToken cancellationToken = default);
     public Task<ServiceResponse<PagedResponse<ProviderDTO>>> GetProviders(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default);
-    public Task<ServiceResponse> AddProvider(ProviderDTO provider, CancellationToken cancellationToken = default);
-    public Task<ServiceResponse> UpdateProvider(ProviderDTO provider, CancellationToken cancellationToken = default);
-    public Task<ServiceResponse> DeleteProvider(Guid id, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> AddProvider(AddProviderDTO provider, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> AddProviderInit(ProviderDTO provider, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> UpdateProvider(UpdateProviderDTO provider, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> UpdateProviderRaioaneList(UpdateRaionProvidersListDTO provider, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> DeleteProvider(string name, CancellationToken cancellationToken = default);
 }

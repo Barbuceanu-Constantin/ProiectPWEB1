@@ -6,6 +6,7 @@ using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Core.Specifications;
 using MobyLabWebProgramming.Infrastructure.Database;
 using MobyLabWebProgramming.Infrastructure.Repositories.Interfaces;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
@@ -53,7 +54,8 @@ public class RaionService : IRaionService
         {
             Id = raion.Id,
             Name = raion.Name,
-            SefRaionId = raion.SefRaionId
+            SefRaionId = raion.SefRaionId,
+            Providers = new Collection<Provider>()
         }, cancellationToken);          // A new entity is created and persisted in the database.
 
         if (result != null) counter++;
@@ -80,7 +82,8 @@ public class RaionService : IRaionService
         {
             Id = guidValue,
             Name = raion.Name,
-            SefRaionId = raion.SefRaionId
+            SefRaionId = raion.SefRaionId,
+            Providers = new Collection<Provider>()
         }, cancellationToken);          // A new entity is created and persisted in the database.
 
         if ( result != null ) counter++;
@@ -99,6 +102,26 @@ public class RaionService : IRaionService
             entity.SefRaionId = raion.SefRaionId;
 
             await _repository.UpdateAsync(entity, cancellationToken); // Update the entity and persist the changes.
+        }
+
+        return ServiceResponse.ForSuccess();
+    }
+
+    public async Task<ServiceResponse> UpdateRaionProvidersList(UpdateRaionProvidersListDTO raion, CancellationToken cancellationToken = default)
+    {
+        var entityRaion = await _repository.GetAsync(new RaionSpec(raion.raion), cancellationToken);
+        var entityProvider = await _repository.GetAsync(new ProviderSpec(raion.provider), cancellationToken);
+
+        if (entityRaion != null && entityProvider != null) // Verify if the raion is not found, you cannot update an non-existing entity.
+        {
+            if (entityRaion.Providers == null)
+            {
+                entityRaion.Providers = new Collection<Provider>(); // Initialize the Providers collection if it's null
+            }
+
+            entityRaion.Providers.Add(entityProvider);
+
+            await _repository.UpdateAsync(entityRaion, cancellationToken); // Update the entity and persist the changes.
         }
 
         return ServiceResponse.ForSuccess();

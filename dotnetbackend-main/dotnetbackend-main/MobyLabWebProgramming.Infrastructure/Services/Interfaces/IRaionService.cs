@@ -11,6 +11,8 @@ public interface IRaionService
     public Task<ServiceResponse> AddRaionInit(RaionDTO raion, CancellationToken cancellationToken = default);
     public Task<ServiceResponse> AddRaion(AddRaionDTO raion, CancellationToken cancellationToken = default);
     public Task<ServiceResponse> UpdateRaion(UpdateRaionDTO raion, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> UpdateRaionProvidersList(UpdateRaionProvidersListDTO raion, CancellationToken cancellationToken = default);
+
     public Task<ServiceResponse> DeleteRaion(string name, CancellationToken cancellationToken = default);
 }
 

@@ -1,5 +1,6 @@
 ﻿using MobyLabWebProgramming.Core.Entities;
 using MobyLabWebProgramming.Core.Enums;
+using System.Collections.ObjectModel;
 
 namespace MobyLabWebProgramming.Core.DataTransferObjects;
 
@@ -12,5 +13,4 @@ public class ProviderDTO
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
     public string CountryOfOrigin { get; set; } = default!;
-    public ICollection<Raion> Raioane { get; set; } = default!;
 }

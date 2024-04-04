@@ -87,7 +87,7 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     /// This method implements the Update operation (U from CRUD) on a job. 
     /// </summary>
     [Authorize]
-    [HttpPut] // This attribute will make the controller respond to a HTTP PUT request on the route /api/Job/Update.
+    [HttpPut("UpdateBasicaData")] // This attribute will make the controller respond to a HTTP PUT request on the route /api/Job/Update.
     public async Task<ActionResult<RequestResponse>> Update([FromBody] UpdateRaionDTO raion) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
     {
         var currentUser = await GetCurrentUser();
@@ -95,6 +95,26 @@ public class RaionController : AuthorizedController // Here we use the Authorize
         if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
         {
             return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaion(raion)) :
+                                                this.ErrorMessageResult();
+        }
+        else
+        {
+            return this.ErrorMessageResult();
+        }
+    }
+
+    /// <summary>
+    /// This method implements the Update operation (U from CRUD) on a job. 
+    /// </summary>
+    [Authorize]
+    [HttpPut("UpdateProvidersList")] // This attribute will make the controller respond to a HTTP PUT request on the route /api/Job/Update.
+    public async Task<ActionResult<RequestResponse>> Update([FromBody] UpdateRaionProvidersListDTO raion) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
+    {
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaionProvidersList(raion)) :
                                                 this.ErrorMessageResult();
         }
         else

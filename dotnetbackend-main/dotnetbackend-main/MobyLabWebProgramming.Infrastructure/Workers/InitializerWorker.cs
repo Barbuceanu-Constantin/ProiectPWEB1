@@ -201,35 +201,35 @@ public class InitializerWorker : BackgroundService
                 /////////////////////////////////////////////
 
                 /////////////////////////////////////////////
-                await providerService.AddProvider(new()
+                await providerService.AddProviderInit(new()
                 {
                     Id = new Guid("00000001-0000-0000-0000-000000000000".ToString()),
                     Name = "Gardena",
                     CountryOfOrigin = "Romania"
                 }, cancellationToken: cancellationToken);
 
-                await providerService.AddProvider(new()
+                await providerService.AddProviderInit(new()
                 {
                     Id = new Guid("00000002-0000-0000-0000-000000000000".ToString()),
                     Name = "Husqvarna",
                     CountryOfOrigin = "Suedia"
                 }, cancellationToken: cancellationToken);
 
-                await providerService.AddProvider(new()
+                await providerService.AddProviderInit(new()
                 {
                     Id = new Guid("00000003-0000-0000-0000-000000000000".ToString()),
                     Name = "Phillips",
                     CountryOfOrigin = "Olanda"
                 }, cancellationToken: cancellationToken);
 
-                await providerService.AddProvider(new()
+                await providerService.AddProviderInit(new()
                 {
                     Id = new Guid("00000004-0000-0000-0000-000000000000".ToString()),
                     Name = "Kotarbau",
                     CountryOfOrigin = "Suedia"
                 }, cancellationToken: cancellationToken);
 
-                await providerService.AddProvider(new()
+                await providerService.AddProviderInit(new()
                 {
                     Id = new Guid("00000005-0000-0000-0000-000000000000".ToString()),
                     Name = "Zanussi",

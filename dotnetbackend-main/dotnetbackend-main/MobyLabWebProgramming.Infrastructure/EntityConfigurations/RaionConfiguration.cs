@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Hosting;
 using MobyLabWebProgramming.Core.Entities;
+using System.Reflection.Emit;
 
 namespace MobyLabWebProgramming.Infrastructure.EntityConfigurations;
 public class RaionConfiguration : IEntityTypeConfiguration<Raion>
