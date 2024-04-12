@@ -1,4 +1,5 @@
-﻿using MobyLabWebProgramming.Core.DataTransferObjects;
+﻿using Ardalis.Specification;
+using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
 using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
@@ -17,7 +18,6 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 public class ProviderService : IProviderService
 {
     private readonly IRepository<WebAppDatabaseContext> _repository;
-    private static int counter = 0;
 
     /// <summary>
     /// Inject the required services through the constructor.
@@ -40,6 +40,12 @@ public class ProviderService : IProviderService
     {
         var result = await _repository.PageAsync(pagination, new ProviderProjectionSpec(pagination.Search), cancellationToken); // Use the specification and pagination API to get only some entities from the database.
 
+        var toBeAdded = await _repository.ListAsync(new ProviderProjectionSpec(pagination.Search), cancellationToken);
+
+        if (toBeAdded != null) {
+            result.Data = toBeAdded;
+        };
+
         return result != null ? ServiceResponse<PagedResponse<ProviderDTO>>.ForSuccess(result) :
                                 ServiceResponse<PagedResponse<ProviderDTO>>.FromError(CommonErrors.ProviderFailGet);
     }
@@ -47,49 +53,17 @@ public class ProviderService : IProviderService
     public async Task<ServiceResponse<int>> GetRaionCount(CancellationToken cancellationToken = default) =>
         ServiceResponse<int>.ForSuccess(await _repository.GetCountAsync<Provider>(cancellationToken)); // Get the count of all raion entities in the database.
 
-    public async Task<ServiceResponse> AddProviderInit(ProviderDTO provider, CancellationToken cancellationToken = default)
-    {
-
-        var result = await _repository.AddAsync(new Provider
-        {
-            Id = provider.Id,
-            Name = provider.Name,
-            CountryOfOrigin = provider.CountryOfOrigin,
-            Raioane = new Collection<Raion>()
-        }, cancellationToken); // A new entity is created and persisted in the database.
-
-        if (result != null) counter++;
-
-        return result != null ? ServiceResponse.ForSuccess() :
-                                ServiceResponse.FromError(CommonErrors.RaionFailAdd);
-    }
-
     public async Task<ServiceResponse> AddProvider(AddProviderDTO provider, CancellationToken cancellationToken = default)
     {
-        ////////////////////////////////////////////////////////////////////////
-        // Convert the integer to a byte array
-        byte[] bytes = BitConverter.GetBytes(counter + 1);
-
-        // Pad the byte array to ensure it's 16 bytes long (required for GUID)
-        byte[] paddedBytes = new byte[16];
-        Array.Copy(bytes, paddedBytes, Math.Min(bytes.Length, 16));
-
-        // Create a new GUID using the byte array
-        Guid guidValue = new Guid(paddedBytes);
-        ////////////////////////////////////////////////////////////////////////
-
         var result = await _repository.AddAsync(new Provider
         {
-            Id = guidValue,
             Name = provider.NameProvider,
             CountryOfOrigin = provider.CountryOfOrigin,
             Raioane = new Collection<Raion>()
         }, cancellationToken); // A new entity is created and persisted in the database.
 
-        if (result != null) counter++;
-
         return result != null ? ServiceResponse.ForSuccess() :
-                                ServiceResponse.FromError(CommonErrors.RaionFailAdd);
+                                ServiceResponse.FromError(CommonErrors.ProviderFailAdd);
     }
 
     public async Task<ServiceResponse> UpdateProvider(UpdateProviderDTO provider, CancellationToken cancellationToken = default)
@@ -104,7 +78,8 @@ public class ProviderService : IProviderService
             await _repository.UpdateAsync(entity, cancellationToken); // Update the entity and persist the changes.
         }
 
-        return ServiceResponse.ForSuccess();
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.ProviderFailUpdate);
     }
 
     public async Task<ServiceResponse> UpdateProviderRaioaneList(UpdateRaionProvidersListDTO provider, CancellationToken cancellationToken = default)
@@ -124,7 +99,8 @@ public class ProviderService : IProviderService
             await _repository.UpdateAsync(entityProvider, cancellationToken); // Update the entity and persist the changes.
         }
 
-        return ServiceResponse.ForSuccess();
+        return (entityProvider != null && entityRaion != null) ? ServiceResponse.ForSuccess() :
+                                                                 ServiceResponse.FromError(CommonErrors.ProviderFailUpdate);
     }
 
     public async Task<ServiceResponse> DeleteProvider(string name, CancellationToken cancellationToken = default)
@@ -136,7 +112,8 @@ public class ProviderService : IProviderService
             await _repository.DeleteAsync<Provider>(entity.Id, cancellationToken); // Delete the entity.
         }
 
-        return ServiceResponse.ForSuccess();
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.ProviderFailUpdate);
     }
 }
 

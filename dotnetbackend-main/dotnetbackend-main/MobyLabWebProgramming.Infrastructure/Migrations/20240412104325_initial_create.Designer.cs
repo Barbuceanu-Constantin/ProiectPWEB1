@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MobyLabWebProgramming.Infrastructure.Migrations
 {
     [DbContext(typeof(WebAppDatabaseContext))]
-    [Migration("20240404171911_initial_create")]
+    [Migration("20240412104325_initial_create")]
     partial class initial_create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,8 +56,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasAlternateKey("Title");
-
                     b.ToTable("Job");
 
                     b.HasCheckConstraint("CK_Sal_max_NonNegative", "\"Sal_max\" >= 0");
@@ -76,9 +74,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -147,6 +142,9 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("real")
                         .HasDefaultValue(0f);
 
+                    b.Property<Guid>("ProviderId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -164,6 +162,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProviderId");
 
                     b.HasIndex("RaionId");
 
@@ -284,8 +284,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("JobId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("JobTitle")
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -319,7 +319,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
                     b.HasAlternateKey("Email");
 
-                    b.HasIndex("JobId");
+                    b.HasIndex("JobTitle");
 
                     b.ToTable("User");
 
@@ -403,11 +403,19 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Product", b =>
                 {
+                    b.HasOne("MobyLabWebProgramming.Core.Entities.Provider", "Provider")
+                        .WithMany("Products")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MobyLabWebProgramming.Core.Entities.Raion", "Raion")
                         .WithMany("Products")
                         .HasForeignKey("RaionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Provider");
 
                     b.Navigation("Raion");
                 });
@@ -446,7 +454,8 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 {
                     b.HasOne("MobyLabWebProgramming.Core.Entities.Job", "Job")
                         .WithMany("Users")
-                        .HasForeignKey("JobId")
+                        .HasForeignKey("JobTitle")
+                        .HasPrincipalKey("Title")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Job");
@@ -494,6 +503,11 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Product", b =>
                 {
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Provider", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MobyLabWebProgramming.Core.Entities.Raion", b =>

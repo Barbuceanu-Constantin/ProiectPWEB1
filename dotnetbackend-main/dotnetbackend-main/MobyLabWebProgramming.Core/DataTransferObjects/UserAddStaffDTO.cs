@@ -16,5 +16,5 @@ public class UserAddStaffDTO
     public float Salary { get; set; } = default!;
     public float Commission { get; set; } = default!;
 
-    public Guid JobId { get; set; }
+    public string JobTitle { get; set; } = default!;
 }

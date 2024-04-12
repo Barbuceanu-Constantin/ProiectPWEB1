@@ -20,7 +20,8 @@ public sealed class UserProjectionSpec : BaseSpec<UserProjectionSpec, User, User
         Id = e.Id,
         Email = e.Email,
         Name = e.Name,
-        Role = e.Role
+        Role = e.Role,
+        JobTitle = e.JobTitle,
     };
 
     public UserProjectionSpec(bool orderByCreatedAt = true) : base(orderByCreatedAt)

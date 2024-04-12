@@ -45,7 +45,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         //Foreign_keys
         builder.HasOne(u => u.Job)              // Define navigation property
                .WithMany(j => j.Users)          // A job can be assigned to multiple users
-               .HasForeignKey(u => u.JobId)     // Foreign key property
+               .HasPrincipalKey(j => j.Title)   // Functia asta permite legarea la Unique 
+               .HasForeignKey(u => u.JobTitle)     // Foreign keyproperty
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired(false);
         //End of foreign keys

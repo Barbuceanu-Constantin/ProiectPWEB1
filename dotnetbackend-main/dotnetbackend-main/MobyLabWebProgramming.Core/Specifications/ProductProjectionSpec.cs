@@ -6,24 +6,29 @@ using MobyLabWebProgramming.Core.Entities;
 
 namespace MobyLabWebProgramming.Core.Specifications;
 
-public sealed class ProviderProjectionSpec : BaseSpec<ProviderProjectionSpec, Provider, ProviderDTO>
+public sealed class ProductProjectionSpec : BaseSpec<ProductProjectionSpec, Product, ProductDTO>
 {
-    protected override Expression<Func<Provider,ProviderDTO>> Spec => e => new()
+    protected override Expression<Func<Product, ProductDTO>> Spec => e => new()
     {
         Id = e.Id,
         Name = e.Name,
-        CountryOfOrigin = e.CountryOfOrigin
+        Description = e.Description,
+        Warranty = e.Warranty,
+        Price = e.Price,
+        Quantity = e.Quantity,
+        RaionId = e.RaionId,
+        ProviderId = e.ProviderId
     };
 
-    public ProviderProjectionSpec(bool orderByCreatedAt = true) : base(orderByCreatedAt)
+    public ProductProjectionSpec(bool orderByCreatedAt = true) : base(orderByCreatedAt)
     {
     }
 
-    public ProviderProjectionSpec(Guid id) : base(id)
+    public ProductProjectionSpec(Guid id) : base(id)
     {
     }
 
-    public ProviderProjectionSpec(string? search)
+    public ProductProjectionSpec(string? search)
     {
         search = !string.IsNullOrWhiteSpace(search) ? search.Trim() : null;
 

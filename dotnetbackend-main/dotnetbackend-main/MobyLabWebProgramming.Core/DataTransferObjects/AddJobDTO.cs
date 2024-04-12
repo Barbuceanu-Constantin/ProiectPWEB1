@@ -2,9 +2,8 @@
 
 namespace MobyLabWebProgramming.Core.DataTransferObjects;
 
-public class JobDTO
+public class AddJobDTO
 {
-    public Guid Id { get; set; }
     public string Title { get; set; }
     public float Sal_min { get; set; } = default!;
     public float Sal_max { get; set; } = default!;

@@ -1,4 +1,5 @@
-﻿using MobyLabWebProgramming.Core.DataTransferObjects;
+﻿using Ardalis.Specification;
+using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
 using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
@@ -34,7 +35,7 @@ public class JobService : IJobService
 
         return result != null ?
             ServiceResponse<JobDTO>.ForSuccess(result) :
-            ServiceResponse<JobDTO>.FromError(CommonErrors.JobFailAdd); // Pack the result or error into a ServiceResponse.
+            ServiceResponse<JobDTO>.FromError(CommonErrors.JobFailGet); // Pack the result or error into a ServiceResponse.
     }
     /// <summary>
     /// GetJobs returns page with job information from the database.
@@ -43,23 +44,33 @@ public class JobService : IJobService
     {
         var result = await _repository.PageAsync(pagination, new JobProjectionSpec(pagination.Search), cancellationToken); // Use the specification and pagination API to get only some entities from the database.
 
-        return ServiceResponse<PagedResponse<JobDTO>>.ForSuccess(result);
+        var toBeAdded = await _repository.ListAsync(new JobProjectionSpec(pagination.Search), cancellationToken);
+
+        if (toBeAdded != null)
+        {
+            result.Data = toBeAdded;
+        };
+
+        return result != null ? ServiceResponse<PagedResponse<JobDTO>>.ForSuccess(result) :
+                                ServiceResponse<PagedResponse<JobDTO>>.FromError(CommonErrors.JobFailGet);
     }
 
     /// <summary>
     /// AddJob adds an job
     /// </summary>
-    public async Task<ServiceResponse> AddJob(JobDTO job, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> AddJob(AddJobDTO job, CancellationToken cancellationToken = default)
     {
-        await _repository.AddAsync(new Job
+        var smin = job.Sal_min;
+        var smax = job.Sal_max;
+        var result = await _repository.AddAsync(new Job
         {
-            Id = job.Id,
             Title = job.Title,
-            Sal_min = job.Sal_min,
-            Sal_max = job.Sal_max,
+            Sal_min = job.Title != "Client" ? job.Sal_min : 0,
+            Sal_max = job.Title != "Client" ? job.Sal_max : 0
         }, cancellationToken); // A new entity is created and persisted in the database.
 
-        return ServiceResponse.ForSuccess();
+        return result != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.JobFailAdd);
     }
     /// <summary>
     /// UpdateJob updates a job
@@ -77,16 +88,23 @@ public class JobService : IJobService
             await _repository.UpdateAsync(entity, cancellationToken); // Update the entity and persist the changes.
         }
 
-        return ServiceResponse.ForSuccess();
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.JobFailUpdate);
     }
     /// <summary>
     /// DeleteJob deletes a job
     /// </summary>
     public async Task<ServiceResponse> DeleteJob(Guid id, CancellationToken cancellationToken = default)
     {
-        await _repository.DeleteAsync<Job>(id, cancellationToken); // Delete the entity.
+        var entity = await _repository.GetAsync(new JobSpec(id), cancellationToken);
 
-        return ServiceResponse.ForSuccess();
+        if (entity != null)
+        {
+            await _repository.DeleteAsync<Job>(id, cancellationToken); // Delete the entity.
+        }
+
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.JobFailDelete);
     }
 }
 

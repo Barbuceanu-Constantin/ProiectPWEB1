@@ -20,7 +20,7 @@ public class UserService : IUserService
     private readonly IRepository<WebAppDatabaseContext> _repository;
     private readonly ILoginService _loginService;
     private readonly IMailService _mailService;
-    private static int counter = 0;
+
     /// <summary>
     /// Inject the required services through the constructor.
     /// </summary>
@@ -44,7 +44,15 @@ public class UserService : IUserService
     {
         var result = await _repository.PageAsync(pagination, new UserProjectionSpec(pagination.Search), cancellationToken); // Use the specification and pagination API to get only some entities from the database.
 
-        return ServiceResponse<PagedResponse<UserDTO>>.ForSuccess(result);
+        var toBeAdded = await _repository.ListAsync(new UserProjectionSpec(pagination.Search), cancellationToken);
+
+        if (toBeAdded != null)
+        {
+            result.Data = toBeAdded;
+        };
+
+        return result != null ? ServiceResponse<PagedResponse<UserDTO>>.ForSuccess(result) :
+                                ServiceResponse<PagedResponse<UserDTO>>.FromError(CommonErrors.UserNotFound);
     }
 
     public async Task<ServiceResponse<LoginResponseDTO>> Login(LoginDTO login, CancellationToken cancellationToken = default)
@@ -67,7 +75,7 @@ public class UserService : IUserService
             Email = result.Email,
             Name = result.Name,
             Role = result.Role,
-            JobId = result.JobId //adaugat de mine
+            JobTitle = result.JobTitle //adaugat de mine
         };
 
         return ServiceResponse<LoginResponseDTO>.ForSuccess(new()
@@ -94,34 +102,19 @@ public class UserService : IUserService
             return ServiceResponse.FromError(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // Convert the integer to a byte array
-        byte[] bytes = BitConverter.GetBytes(counter + 1);
-
-        // Pad the byte array to ensure it's 16 bytes long (required for GUID)
-        byte[] paddedBytes = new byte[16];
-        Array.Copy(bytes, paddedBytes, Math.Min(bytes.Length, 16));
-
-        // Create a new GUID using the byte array
-        Guid guidValue = new Guid(paddedBytes);
-        ////////////////////////////////////////////////////////////////////////
-
         await _repository.AddAsync(new User
         {
-            Id = guidValue,
             Email = user.Email,
             Name = user.Name,
             Role = user.Role,
             Password = user.Password,
-            JobId = user.JobId,  //adaugat de mine
+            JobTitle = user.JobTitle,  //adaugat de mine
             PhoneNumber = user.PhoneNumber,
             HireDate = user.HireDate,
             Salary = user.Salary,
             Commission = user.Commission
         }, cancellationToken); // A new entity is created and persisted in the database.
 
-        counter++;
-        
         await _mailService.SendMail(user.Email, "Welcome!", MailTemplates.UserAddTemplate(user.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
 
         return ServiceResponse.ForSuccess();
@@ -141,29 +134,13 @@ public class UserService : IUserService
             return ServiceResponse.FromError(new(HttpStatusCode.Conflict, "The user already exists!", ErrorCodes.UserAlreadyExists));
         }
 
-        ////////////////////////////////////////////////////////////////////////
-        // Convert the integer to a byte array
-        byte[] bytes = BitConverter.GetBytes(counter + 1);
-
-        // Pad the byte array to ensure it's 16 bytes long (required for GUID)
-        byte[] paddedBytes = new byte[16];
-        Array.Copy(bytes, paddedBytes, Math.Min(bytes.Length, 16));
-
-        // Create a new GUID using the byte array
-        Guid guidValue = new Guid(paddedBytes);
-        ////////////////////////////////////////////////////////////////////////
-
         await _repository.AddAsync(new User
         {
-            Id = guidValue,
             Email = user.Email,
             Name = user.Name,
             Role = user.Role,
-            Password = user.Password,
-            JobId = new Guid("00000001-0000-0000-0000-000000000000")
+            Password = user.Password
         }, cancellationToken); // A new entity is created and persisted in the database.
-
-        counter += 1;
 
         await _mailService.SendMail(user.Email, "Welcome!", MailTemplates.UserAddTemplate(user.Name), true, "My App", cancellationToken); // You can send a notification on the user email. Change the email if you want.
 

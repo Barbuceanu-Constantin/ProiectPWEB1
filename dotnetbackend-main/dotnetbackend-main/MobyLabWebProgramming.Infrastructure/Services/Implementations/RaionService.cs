@@ -1,4 +1,5 @@
-﻿using MobyLabWebProgramming.Core.DataTransferObjects;
+﻿using Ardalis.Specification;
+using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
 using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
@@ -18,7 +19,6 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 public class RaionService : IRaionService
 {
     private readonly IRepository<WebAppDatabaseContext> _repository;
-    private static int counter = 0;
 
     /// <summary>
     /// Inject the required services through the constructor.
@@ -41,6 +41,13 @@ public class RaionService : IRaionService
     {
         var result = await _repository.PageAsync(pagination, new RaionProjectionSpec(pagination.Search), cancellationToken); // Use the specification and pagination API to get only some entities from the database.
 
+        var toBeAdded = await _repository.ListAsync(new RaionProjectionSpec(pagination.Search), cancellationToken);
+
+        if (toBeAdded != null)
+        {
+            result.Data = toBeAdded;
+        };
+
         return result != null ? ServiceResponse<PagedResponse<RaionDTO>>.ForSuccess(result) :
                                 ServiceResponse<PagedResponse<RaionDTO>>.FromError(CommonErrors.RaionFailGet);
     }
@@ -48,45 +55,14 @@ public class RaionService : IRaionService
     public async Task<ServiceResponse<int>> GetRaionCount(CancellationToken cancellationToken = default) =>
         ServiceResponse<int>.ForSuccess(await _repository.GetCountAsync<Raion>(cancellationToken)); // Get the count of all raion entities in the database.
 
-    public async Task<ServiceResponse> AddRaionInit(RaionDTO raion, CancellationToken cancellationToken = default)
-    {
-        var result = await _repository.AddAsync(new Raion
-        {
-            Id = raion.Id,
-            Name = raion.Name,
-            SefRaionId = raion.SefRaionId,
-            Providers = new Collection<Provider>()
-        }, cancellationToken);          // A new entity is created and persisted in the database.
-
-        if (result != null) counter++;
-
-        return result != null ? ServiceResponse.ForSuccess() :
-                                ServiceResponse.FromError(CommonErrors.RaionFailAdd);
-    }
-
     public async Task<ServiceResponse> AddRaion(AddRaionDTO raion, CancellationToken cancellationToken = default)
     {
-        ////////////////////////////////////////////////////////////////////////
-        // Convert the integer to a byte array
-        byte[] bytes = BitConverter.GetBytes(counter + 1);
-
-        // Pad the byte array to ensure it's 16 bytes long (required for GUID)
-        byte[] paddedBytes = new byte[16];
-        Array.Copy(bytes, paddedBytes, Math.Min(bytes.Length, 16));
-
-        // Create a new GUID using the byte array
-        Guid guidValue = new Guid(paddedBytes);
-        ////////////////////////////////////////////////////////////////////////
-
         var result = await _repository.AddAsync(new Raion
         {
-            Id = guidValue,
             Name = raion.Name,
             SefRaionId = raion.SefRaionId,
             Providers = new Collection<Provider>()
         }, cancellationToken);          // A new entity is created and persisted in the database.
-
-        if ( result != null ) counter++;
 
         return result != null ? ServiceResponse.ForSuccess() :
                                 ServiceResponse.FromError(CommonErrors.RaionFailAdd);
@@ -104,7 +80,8 @@ public class RaionService : IRaionService
             await _repository.UpdateAsync(entity, cancellationToken); // Update the entity and persist the changes.
         }
 
-        return ServiceResponse.ForSuccess();
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.RaionFailUpdate);
     }
 
     public async Task<ServiceResponse> UpdateRaionProvidersList(UpdateRaionProvidersListDTO raion, CancellationToken cancellationToken = default)
@@ -124,7 +101,8 @@ public class RaionService : IRaionService
             await _repository.UpdateAsync(entityRaion, cancellationToken); // Update the entity and persist the changes.
         }
 
-        return ServiceResponse.ForSuccess();
+        return (entityRaion != null && entityProvider != null) ? ServiceResponse.ForSuccess() :
+                                                                 ServiceResponse.FromError(CommonErrors.RaionFailUpdate);
     }
 
     public async Task<ServiceResponse> DeleteRaion(string name, CancellationToken cancellationToken = default)
@@ -136,6 +114,7 @@ public class RaionService : IRaionService
             await _repository.DeleteAsync<Raion>(entity.Id, cancellationToken); // Delete the entity.
         }
 
-        return ServiceResponse.ForSuccess();
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.RaionFailUpdate);
     }
 }

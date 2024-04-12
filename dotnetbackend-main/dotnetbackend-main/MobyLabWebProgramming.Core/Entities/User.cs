@@ -17,8 +17,8 @@ public class User : BaseEntity
     public UserRoleEnum Role { get; set; } = default!;
 
     //job_id foreign_key
-    public Guid JobId { get; set; } = default!;
-    public Job Job { get; set; } = default!;
+    public string? JobTitle { get; set; }
+    public Job? Job { get; set; }
 
     /// <summary>
     /// References to other entities such as this are used to automatically fetch correlated data, this is called a navigation property.

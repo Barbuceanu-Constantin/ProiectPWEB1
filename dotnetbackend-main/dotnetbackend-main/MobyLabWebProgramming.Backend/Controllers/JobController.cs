@@ -64,7 +64,7 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
 
     [Authorize] ///Aici am facut modificarea cand am vorbit cu el. Acum am refacut cum era.
     [HttpPost] // This attribute will make the controller respond to a HTTP POST request on the route /api/Job/Add.
-    public async Task<ActionResult<RequestResponse>> Add([FromBody] JobDTO job)
+    public async Task<ActionResult<RequestResponse>> Add([FromBody] AddJobDTO job)
     {
         var currentUser = await GetCurrentUser();
         if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
