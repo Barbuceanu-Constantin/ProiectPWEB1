@@ -91,8 +91,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion ||
-            currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
         {
             return currentUser.Result != null ? this.FromServiceResponse(await _productService.UpdateProduct(product)) :
                                                 this.ErrorMessageResult();
@@ -112,8 +111,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion ||
-            currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
         {
             return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(name)) :
                                                 this.ErrorMessageResult(currentUser.Error);
@@ -133,8 +131,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion ||
-            currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
         {
             return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(id)) :
                                                 this.ErrorMessageResult(currentUser.Error);

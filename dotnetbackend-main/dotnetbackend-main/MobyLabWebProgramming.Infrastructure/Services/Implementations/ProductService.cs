@@ -98,9 +98,9 @@ public class ProductService : IProductService
     {
         var entity = await _repository.GetAsync(new ProductSpec(id), cancellationToken);
 
-        if (entity != null) // Verify if the raion is not found, you cannot update an non-existing entity.
+        if (entity != null)
         {
-            await _repository.DeleteAsync<Raion>(entity.Id, cancellationToken); // Delete the entity.
+            await _repository.DeleteAsync<Order>(entity.Id, cancellationToken); // Delete the entity.
         }
 
         return entity != null ? ServiceResponse.ForSuccess() :
@@ -111,7 +111,7 @@ public class ProductService : IProductService
     {
         var entity = await _repository.GetAsync(new ProductSpec(name), cancellationToken);
 
-        if (entity != null) // Verify if the raion is not found, you cannot update an non-existing entity.
+        if (entity != null)
         {
             await _repository.DeleteAsync<Product>(entity.Id, cancellationToken); // Delete the entity.
         }
