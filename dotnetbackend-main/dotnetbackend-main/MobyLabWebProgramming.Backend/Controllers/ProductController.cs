@@ -8,6 +8,7 @@ using MobyLabWebProgramming.Infrastructure.Authorization;
 using MobyLabWebProgramming.Infrastructure.Extensions;
 using MobyLabWebProgramming.Infrastructure.Services.Implementations;
 using MobyLabWebProgramming.Infrastructure.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace MobyLabWebProgramming.Backend.Controllers;
 
@@ -19,12 +20,15 @@ namespace MobyLabWebProgramming.Backend.Controllers;
 public class ProductController : AuthorizedController // Here we use the AuthorizedController as the base class because it derives ControllerBase and also has useful methods to retrieve user information.
 {
     private readonly IProductService _productService;
+    private readonly IRaionService _raionService;
     /// <summary>
     /// Inject the required services through the constructor.
     /// </summary>
-    public ProductController(IProductService productService, IUserService userService) : base(userService) // Also, you may pass constructor parameters to a base class constructor and call as specific constructor from the base class.
+    public ProductController(IProductService productService, IRaionService raionService,
+                             IUserService userService) : base(userService) // Also, you may pass constructor parameters to a base class constructor and call as specific constructor from the base class.
     {
         _productService = productService;
+        _raionService = raionService;
     }
 
 
@@ -71,7 +75,10 @@ public class ProductController : AuthorizedController // Here we use the Authori
     public async Task<ActionResult<RequestResponse>> Add([FromBody] AddProductDTO product)
     {
         var currentUser = await GetCurrentUser();
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
+        var raion = _raionService.GetRaion(product.RaionId).Result;
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+            && currentUser.Result.Id == raion.Result.SefRaionId)
         {
             return currentUser.Result != null ? this.FromServiceResponse(await _productService.AddProduct(product)) :
                                                 this.ErrorMessageResult();

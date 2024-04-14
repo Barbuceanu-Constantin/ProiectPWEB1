@@ -12,10 +12,6 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
             .IsRequired();              // Here it is specified if the property is required, meaning it cannot be null in the database.
         builder.HasKey(x => x.Id);      // Here it is specifies that the property Id is the primary key.
 
-        builder.Property(e => e.TotalPrice)
-            .HasDefaultValue(0)
-            .HasPrecision(12, 2)
-            .IsRequired();
         builder.Property(e => e.PaymentMethod)
             .HasMaxLength(50)
             .IsRequired(false);

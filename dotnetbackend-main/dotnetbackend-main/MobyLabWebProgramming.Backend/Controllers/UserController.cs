@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
+using MobyLabWebProgramming.Core.Entities;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -32,9 +33,15 @@ public class UserController : AuthorizedController // Here we use the Authorized
     {
         var currentUser = await GetCurrentUser();
 
-        return currentUser.Result != null ? 
-            this.FromServiceResponse(await UserService.GetUser(id)) : 
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || 
+            currentUser.Result.Id == id)
+        {
+            return currentUser.Result != null ?
+            this.FromServiceResponse(await UserService.GetUser(id)) :
             this.ErrorMessageResult<UserDTO>(currentUser.Error);
+        }
+
+        return this.ErrorMessageResult<UserDTO>(currentUser.Error);
     }
 
     /// <summary>
@@ -49,9 +56,14 @@ public class UserController : AuthorizedController // Here we use the Authorized
     {
         var currentUser = await GetCurrentUser();
 
-        return currentUser.Result != null ?
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ?
             this.FromServiceResponse(await UserService.GetUsers(pagination)) :
             this.ErrorMessageResult<PagedResponse<UserDTO>>(currentUser.Error);
+        }
+
+        return this.ErrorMessageResult<PagedResponse<UserDTO>>(currentUser.Error);
     }
 
     /// <summary>
@@ -64,8 +76,14 @@ public class UserController : AuthorizedController // Here we use the Authorized
         var currentUser = await GetCurrentUser();
         user.Password = PasswordUtils.HashPassword(user.Password);
 
-        return currentUser.Result != null ? this.FromServiceResponse(await UserService.AddStaffUser(user, null)) :
-                                            this.ErrorMessageResult(currentUser.Error);
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await UserService.AddStaffUser(user, null)) :
+                                                this.ErrorMessageResult(currentUser.Error);
+
+        }
+
+        return this.ErrorMessageResult(currentUser.Error);
     }
 
     /// <summary>
@@ -78,8 +96,13 @@ public class UserController : AuthorizedController // Here we use the Authorized
         var currentUser = await GetCurrentUser();
         user.Password = PasswordUtils.HashPassword(user.Password);
 
-        return currentUser.Result != null ? this.FromServiceResponse(await UserService.AddClientUser(user, null)) :
-                                            this.ErrorMessageResult(currentUser.Error);
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await UserService.AddClientUser(user, null)) :
+                                                this.ErrorMessageResult(currentUser.Error);
+        }
+
+        return this.ErrorMessageResult(currentUser.Error);
     }
 
     /// <summary>
@@ -91,12 +114,18 @@ public class UserController : AuthorizedController // Here we use the Authorized
     {
         var currentUser = await GetCurrentUser();
 
-        return currentUser.Result != null ?
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin ||
+            currentUser.Result.Id == user.Id)
+        {
+            return currentUser.Result != null ?
             this.FromServiceResponse(await UserService.UpdateUser(user with
             {
                 Password = !string.IsNullOrWhiteSpace(user.Password) ? PasswordUtils.HashPassword(user.Password) : null
             }, currentUser.Result)) :
             this.ErrorMessageResult(currentUser.Error);
+        }
+
+        return this.ErrorMessageResult(currentUser.Error);
     }
 
     /// <summary>
@@ -109,8 +138,14 @@ public class UserController : AuthorizedController // Here we use the Authorized
     {
         var currentUser = await GetCurrentUser();
 
-        return currentUser.Result != null ?
-            this.FromServiceResponse(await UserService.DeleteUser(id)) :
-            this.ErrorMessageResult(currentUser.Error);
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin ||
+            currentUser.Result.Id == id)
+        {
+            return currentUser.Result != null ?
+                                this.FromServiceResponse(await UserService.DeleteUser(id)) :
+                                this.ErrorMessageResult(currentUser.Error);
+        }
+
+        return this.ErrorMessageResult(currentUser.Error);
     }
 }

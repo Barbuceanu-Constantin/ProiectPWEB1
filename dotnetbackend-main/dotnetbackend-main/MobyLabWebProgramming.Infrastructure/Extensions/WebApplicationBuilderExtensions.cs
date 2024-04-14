@@ -174,12 +174,13 @@ public static class WebApplicationBuilderExtensions
             .AddTransient<IFileRepository, FileRepository>()
             .AddTransient<IUserFileService, UserFileService>()
             .AddTransient<IMailService, MailService>()
-            .AddTransient<IJobService, JobService>()            //Adaugata de mine
-            .AddTransient<IProviderService, ProviderService>()  //Adaugata de mine
-            .AddTransient<IRaionService, RaionService>()        //Adaugata de mine
-            .AddTransient<IProductService, ProductService>()    //Adaugata de mine
-            .AddTransient<IOrderService, OrderService>()        //Adaugata de mine
-            .AddTransient<IPaymentService, PaymentService>();   //Adaugata de mine
+            .AddTransient<IJobService, JobService>()                    //Adaugata de mine
+            .AddTransient<IProviderService, ProviderService>()          //Adaugata de mine
+            .AddTransient<IRaionService, RaionService>()                //Adaugata de mine
+            .AddTransient<IProductService, ProductService>()            //Adaugata de mine
+            .AddTransient<IOrderService, OrderService>()                //Adaugata de mine
+            .AddTransient<IPaymentService, PaymentService>()            //Adaugata de mine
+            .AddTransient<ITransactionService, TransactionService>();   //Adaugata de mine
 
         return builder;
     }

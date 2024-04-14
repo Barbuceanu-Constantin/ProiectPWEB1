@@ -15,6 +15,11 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .HasDefaultValue(0)
             .IsRequired();
 
+        builder.Property(e => e.TotalPrice)
+            .HasDefaultValue(0)
+            .HasPrecision(12, 2)
+            .IsRequired();
+
         //Foreign_keys
         builder.HasOne(t => t.Product)
                .WithMany(p => p.Transactions)

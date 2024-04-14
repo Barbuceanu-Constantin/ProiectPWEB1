@@ -147,7 +147,6 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     PaymentMethod = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    TotalPrice = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
@@ -227,6 +226,7 @@ namespace MobyLabWebProgramming.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    TotalPrice = table.Column<float>(type: "real", precision: 12, scale: 2, nullable: false, defaultValue: 0f),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     OrderId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),

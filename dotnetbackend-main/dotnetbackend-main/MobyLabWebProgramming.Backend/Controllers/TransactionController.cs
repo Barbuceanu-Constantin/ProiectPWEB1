@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MailKit.Search;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
@@ -8,6 +9,7 @@ using MobyLabWebProgramming.Infrastructure.Authorization;
 using MobyLabWebProgramming.Infrastructure.Extensions;
 using MobyLabWebProgramming.Infrastructure.Services.Implementations;
 using MobyLabWebProgramming.Infrastructure.Services.Interfaces;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace MobyLabWebProgramming.Backend.Controllers;
 
@@ -19,12 +21,16 @@ namespace MobyLabWebProgramming.Backend.Controllers;
 public class TransactionController : AuthorizedController // Here we use the AuthorizedController as the base class because it derives ControllerBase and also has useful methods to retrieve user information.
 {
     private readonly ITransactionService _transactionService;
+    private readonly IOrderService _orderService;
     /// <summary>
     /// Inject the required services through the constructor.
     /// </summary>
-    public TransactionController(ITransactionService transactionService, IUserService userService) : base(userService) // Also, you may pass constructor parameters to a base class constructor and call as specific constructor from the base class.
+    public TransactionController(ITransactionService transactionService, 
+                                 IOrderService orderService, 
+                                 IUserService userService) : base(userService) // Also, you may pass constructor parameters to a base class constructor and call as specific constructor from the base class.
     {
         _transactionService = transactionService;
+        _orderService = orderService;
     }
 
 
@@ -32,21 +38,84 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     [HttpGet("{id:guid}")] // This attribute will make the controller respond to a HTTP GET request on the route /api/Job/GetById/<some_guid>.
     public async Task<ActionResult<RequestResponse<TransactionDTO>>> GetById([FromRoute] Guid id) // The FromRoute attribute will bind the id from the route to this parameter.
     {
-        return null;
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            var task = _transactionService.GetTransaction(id).Result;
+
+            return task.Result != null ? this.FromServiceResponse(await _transactionService.GetTransaction(id)) :
+                                         this.ErrorMessageResult<TransactionDTO>(task.Error);
+        }
+        else
+        {
+            var task = _transactionService.GetTransaction(id).Result;
+            var order = _orderService.GetOrder(task.Result.OrderId).Result;
+
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                if (currentUser.Result.Id == order.Result.ClientId)
+                    return task.Result != null ? this.FromServiceResponse(await _transactionService.GetTransaction(id)) :
+                                                 this.ErrorMessageResult<TransactionDTO>(task.Error);
+
+            return this.ErrorMessageResult<TransactionDTO>();
+        }
     }
 
     [Authorize]
     [HttpGet] // This attribute will make the controller respond to a HTTP GET request on the route /api/Job/GetPage.
     public async Task<ActionResult<RequestResponse<PagedResponse<TransactionDTO>>>> GetPage([FromQuery] PaginationSearchQueryParams pagination)
     {
-        return null;
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactions(pagination)) :
+                                                this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+        }
+        else
+        {
+            return this.ErrorMessageResult<PagedResponse<TransactionDTO>>();
+        }
+    }
+
+    [Authorize]
+    [HttpGet] // This attribute will make the controller respond to a HTTP GET request on the route /api/Job/GetPage.
+    public async Task<ActionResult<RequestResponse<PagedResponse<TransactionDTO>>>> GetTransactionsForOrder([FromQuery] PaginationSearchQueryParams pagination, Guid orderId)
+    {
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId)) :
+                                                this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+        }
+        else
+        {
+            var order = _orderService.GetOrder(orderId).Result;
+
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                if (order.Result.ClientId == currentUser.Result.Id)
+                    return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId)) :
+                                                        this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+            
+            return this.ErrorMessageResult<PagedResponse<TransactionDTO>>();
+        }
     }
 
     [Authorize] ///Aici am facut modificarea cand am vorbit cu el. Acum am refacut cum era.
     [HttpPost] // This attribute will make the controller respond to a HTTP POST request on the route /api/Job/Add.
-    public async Task<ActionResult<RequestResponse>> Add([FromBody] TransactionDTO transaction)
+    public async Task<ActionResult<RequestResponse>> Add([FromBody] AddTransactionDTO transaction)
     {
-        return null;
+        var currentUser = await GetCurrentUser();
+        var order = _orderService.GetOrder(transaction.OrderId).Result;
+
+        if (currentUser != null && order != null)
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                if (order.Result.ClientId == currentUser.Result.Id)
+                    return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.AddTransaction(transaction)) :
+                                                        this.ErrorMessageResult();
+
+        return this.ErrorMessageResult();
     }
 
     /// <summary>
@@ -56,7 +125,17 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     [HttpPut] // This attribute will make the controller respond to a HTTP PUT request on the route /api/Job/Update.
     public async Task<ActionResult<RequestResponse>> Update([FromBody] TransactionDTO transaction) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
     {
-        return null;
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.UpdateTransaction(transaction)) :
+                                                this.ErrorMessageResult();
+        }
+        else
+        {
+            return this.ErrorMessageResult();
+        }
     }
 
     /// <summary>
@@ -64,9 +143,19 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     /// </summary>
     [Authorize]
     [HttpDelete("{id:guid}")] // This attribute will make the controller respond to a HTTP DELETE request on the route /api/Job/Delete/<some_guid>.
-    public async Task<ActionResult<RequestResponse>> DeleteById([FromRoute] Guid id) // The FromRoute attribute will bind the id from the route to this parameter.
+    public async Task<ActionResult<RequestResponse>> Delete([FromRoute] Guid id) // The FromRoute attribute will bind the id from the route to this parameter.
     {
-        return null;
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.DeleteTransaction(id)) :
+                                                this.ErrorMessageResult(currentUser.Error);
+        }
+        else
+        {
+            return this.ErrorMessageResult();
+        }
     }
 }
 

@@ -61,7 +61,6 @@ public class PaymentService : IPaymentService
         var result = await _repository.AddAsync(new Payment
         {
             OrderId = payment.OrderId,
-            TotalPrice = payment.TotalPrice,
             PaymentMethod = payment.PaymentMethod
         }, cancellationToken);          // A new entity is created and persisted in the database.
 
@@ -76,7 +75,6 @@ public class PaymentService : IPaymentService
         if (entity != null)
         {
             entity.OrderId = payment.OrderId;
-            entity.TotalPrice = payment.TotalPrice;
             entity.PaymentMethod = payment.PaymentMethod;
             await _repository.UpdateAsync(entity, cancellationToken); // Update the entity and persist the changes.
         }

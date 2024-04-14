@@ -12,7 +12,6 @@ public sealed class PaymentProjectionSpec : BaseSpec<PaymentProjectionSpec, Paym
     {
         Id = e.Id,
         OrderId = e.OrderId,
-        TotalPrice = e.TotalPrice,
         PaymentMethod = e.PaymentMethod
     };
 
