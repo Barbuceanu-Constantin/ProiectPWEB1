@@ -18,7 +18,7 @@ public class LoginService : ILoginService
     /// </summary>
     public LoginService(IOptions<JwtConfiguration> jwtConfiguration) => _jwtConfiguration = jwtConfiguration.Value;
 
-    public string GetToken(UserDTO user, DateTime issuedAt, TimeSpan expiresIn)
+    public string GetToken(UserLoginDTO user, DateTime issuedAt, TimeSpan expiresIn)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtConfiguration.Key); // Use the configured key as the encryption key to sing the JWT.
@@ -28,7 +28,10 @@ public class LoginService : ILoginService
             Claims = new Dictionary<string, object> // Add any other claims in the JWT, you can even add custom claims if you want.
             {
                 { ClaimTypes.Name, user.Name },
-                { ClaimTypes.Email, user.Email }
+                { ClaimTypes.Email, user.Email },
+                { ClaimTypes.Role, user.Role },                 //pus de mine
+                { "JobTitle", user.JobTitle },                  //pus de mine
+                { "PhoneNumber", user.PhoneNumber }
             },
             IssuedAt = issuedAt, // This sets the "iat" claim to indicate then the JWT was emitted.
             Expires = issuedAt.Add(expiresIn), // This sets the "exp" claim to indicate when the JWT expires and cannot be used.
