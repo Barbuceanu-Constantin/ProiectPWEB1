@@ -8,6 +8,7 @@ using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Core.Specifications;
+using MobyLabWebProgramming.Infrastructure.Authorization;
 using MobyLabWebProgramming.Infrastructure.Database;
 using MobyLabWebProgramming.Infrastructure.Repositories.Implementation;
 using MobyLabWebProgramming.Infrastructure.Repositories.Interfaces;
@@ -20,15 +21,46 @@ public class UserService : IUserService
     private readonly IRepository<WebAppDatabaseContext> _repository;
     private readonly ILoginService _loginService;
     private readonly IMailService _mailService;
+    private readonly IJobService _jobService;
 
     /// <summary>
     /// Inject the required services through the constructor.
     /// </summary>
-    public UserService(IRepository<WebAppDatabaseContext> repository, ILoginService loginService, IMailService mailService)
+    public UserService( IRepository<WebAppDatabaseContext> repository,
+                        ILoginService loginService, IMailService mailService, IJobService jobService)
     {
         _repository = repository;
         _loginService = loginService;
         _mailService = mailService;
+        _jobService = jobService;
+    }
+
+    public async Task<ServiceResponse<UserDetailsDTO>> GetUserDetails(UserClaims claims) {
+        claims = claims ?? throw new ArgumentNullException(nameof(claims));
+        
+        UserDetailsDTO userDetailsDTO = new UserDetailsDTO();
+        userDetailsDTO.Id = claims.Id;
+        userDetailsDTO.Username = claims.Name;
+        userDetailsDTO.Email = claims.Email;
+        userDetailsDTO.PhoneNumber = claims.phoneNumber;
+        userDetailsDTO.HireDate = claims.hireDate;
+        userDetailsDTO.Salary = 0;
+        userDetailsDTO.Commission = 0;
+        userDetailsDTO.JobTitle = claims.jobTitle;
+        userDetailsDTO.Role = claims.Role;
+        userDetailsDTO.SalMin = 0;
+        userDetailsDTO.SalMax = 0;
+
+        return ServiceResponse<UserDetailsDTO>.ForSuccess(userDetailsDTO);
+    }
+
+    public async Task<ServiceResponse<UserCompleteDTO>> GetUserEnhanced(Guid id, CancellationToken cancellationToken = default)
+    {
+        var result = await _repository.GetAsync(new UserProjectionSpecSecond(id), cancellationToken); // Get a user using a specification on the repository.
+
+        return result != null ?
+            ServiceResponse<UserCompleteDTO>.ForSuccess(result) :
+            ServiceResponse<UserCompleteDTO>.FromError(CommonErrors.UserNotFound); // Pack the result or error into a ServiceResponse.
     }
 
     public async Task<ServiceResponse<UserDTO>> GetUser(Guid id, CancellationToken cancellationToken = default)
@@ -69,7 +101,7 @@ public class UserService : IUserService
             return ServiceResponse<LoginResponseDTO>.FromError(new(HttpStatusCode.BadRequest, "Wrong password!", ErrorCodes.WrongPassword));
         }
 
-        var user = new UserDTO
+        var user = new UserLoginDTO
         {
             Id = result.Id,
             Email = result.Email,

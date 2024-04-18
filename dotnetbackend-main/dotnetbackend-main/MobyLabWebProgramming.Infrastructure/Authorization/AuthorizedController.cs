@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
+using MobyLabWebProgramming.Core.Enums;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 
@@ -34,8 +35,9 @@ public abstract class AuthorizedController : ControllerBase
         var role = enumerable.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).FirstOrDefault();  //adaugat de mine
         var jobTitle = enumerable.Where(x => x.Type == "JobTitle").Select(x => x.Value).FirstOrDefault();   //adaugat de mine
         var phoneNumber = enumerable.Where(x => x.Type == "PhoneNumber").Select(x => x.Value).FirstOrDefault();   //adaugat de mine
+        var hireDate = enumerable.Where(x => x.Type == "HireDate").Select(x => x.Value).FirstOrDefault();   //adaugat de mine
 
-        _userClaims = new(userId, name, email, role, jobTitle, phoneNumber);
+        _userClaims = new(userId, name, email, role, jobTitle, phoneNumber, hireDate);
 
         return _userClaims;
     }
@@ -44,4 +46,9 @@ public abstract class AuthorizedController : ControllerBase
     /// This method also gets the currently logged user information from the database to provide more information to authorization verifications.
     /// </summary>
     protected Task<ServiceResponse<UserDTO>> GetCurrentUser() => UserService.GetUser(ExtractClaims().Id);
+
+    /// <summary>
+    /// This method also gets the currently logged user information from the database to provide more information to authorization verifications.
+    /// </summary>
+    protected Task<ServiceResponse<UserCompleteDTO>> GetCurrentUserEnhanced() => UserService.GetUserEnhanced(ExtractClaims().Id);
 }

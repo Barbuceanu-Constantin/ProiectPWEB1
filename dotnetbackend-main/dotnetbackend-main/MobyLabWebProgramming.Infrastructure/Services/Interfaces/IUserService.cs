@@ -1,6 +1,7 @@
 ﻿using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
+using MobyLabWebProgramming.Infrastructure.Authorization;
 
 namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 
@@ -10,9 +11,12 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 /// </summary>
 public interface IUserService
 {
+
+    public Task<ServiceResponse<UserDetailsDTO>> GetUserDetails(UserClaims claims);
     /// <summary>
     /// GetUser will provide the information about a user given its user Id.
     /// </summary>
+    public Task<ServiceResponse<UserCompleteDTO>> GetUserEnhanced(Guid id, CancellationToken cancellationToken = default);
     public Task<ServiceResponse<UserDTO>> GetUser(Guid id, CancellationToken cancellationToken = default);
     /// <summary>
     /// GetUsers returns page with user information from the database.

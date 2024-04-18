@@ -26,6 +26,19 @@ public class JobService : IJobService
     {
         _repository = repository;
     }
+
+    /// <summary>
+    /// GetJob will provide the information about a job given its job Id.
+    /// </summary>
+    public async Task<ServiceResponse<JobDTO>> GetJob(string title, CancellationToken cancellationToken = default)
+    {
+        var result = await _repository.GetAsync(new JobSpecSecond(title), cancellationToken); // Get a job using a specification on the repository.
+
+        return result != null ?
+            ServiceResponse<JobDTO>.ForSuccess(result) :
+            ServiceResponse<JobDTO>.FromError(CommonErrors.JobFailGet); // Pack the result or error into a ServiceResponse.
+    }
+
     /// <summary>
     /// GetJob will provide the information about a job given its job Id.
     /// </summary>

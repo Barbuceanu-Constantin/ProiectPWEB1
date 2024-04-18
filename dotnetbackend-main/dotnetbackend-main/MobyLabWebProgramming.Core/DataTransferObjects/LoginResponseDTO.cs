@@ -6,5 +6,5 @@
 public class LoginResponseDTO
 {
     public string Token { get; set; } = default!;
-    public UserDTO User { get; set; } = default!;
+    public UserLoginDTO User { get; set; } = default!;  //Modificat de mine. Era UserDTO
 }

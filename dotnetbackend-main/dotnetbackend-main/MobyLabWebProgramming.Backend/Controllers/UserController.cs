@@ -17,11 +17,29 @@ namespace MobyLabWebProgramming.Backend.Controllers;
 [Route("api/[controller]/[action]")] // The Route attribute prefixes the routes/url paths with template provides as a string, the keywords between [] are used to automatically take the controller and method name.
 public class UserController : AuthorizedController // Here we use the AuthorizedController as the base class because it derives ControllerBase and also has useful methods to retrieve user information.
 {
+    IJobService JobService;
     /// <summary>
     /// Inject the required services through the constructor.
     /// </summary>
-    public UserController(IUserService userService) : base(userService) // Also, you may pass constructor parameters to a base class constructor and call as specific constructor from the base class.
+    public UserController(IJobService jobService, IUserService userService) : base(userService) // Also, you may pass constructor parameters to a base class constructor and call as specific constructor from the base class.
     {
+        JobService = jobService;
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<RequestResponse<UserDetailsDTO>>> GetCurrentUserDetails()
+    {
+        var currentUser = await GetCurrentUserEnhanced();
+        var userDetails =  UserService.GetUserDetails(ExtractClaims());
+        var jobDetails =  JobService.GetJob(userDetails.Result.Result.JobTitle);
+
+        userDetails.Result.Result.Salary = currentUser.Result.Salary;
+        userDetails.Result.Result.Commission = currentUser.Result.Commission;
+        userDetails.Result.Result.SalMin = jobDetails.Result.Result.Sal_min;
+        userDetails.Result.Result.SalMax = jobDetails.Result.Result.Sal_max;
+
+        return this.FromServiceResponse(userDetails.Result);
     }
 
     /// <summary>
