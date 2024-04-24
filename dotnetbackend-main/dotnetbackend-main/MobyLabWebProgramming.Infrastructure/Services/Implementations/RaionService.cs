@@ -70,7 +70,7 @@ public class RaionService : IRaionService
 
     public async Task<ServiceResponse> UpdateRaion(UpdateRaionDTO raion, CancellationToken cancellationToken = default)
     {
-        var entity = await _repository.GetAsync(new RaionSpec(raion.OldName), cancellationToken);
+        var entity = await _repository.GetAsync(new RaionSpec(raion.id), cancellationToken);
 
         if (entity != null) // Verify if the raion is not found, you cannot update an non-existing entity.
         {
@@ -105,9 +105,9 @@ public class RaionService : IRaionService
                                                                  ServiceResponse.FromError(CommonErrors.RaionFailUpdate);
     }
 
-    public async Task<ServiceResponse> DeleteRaion(string name, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> DeleteRaion(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _repository.GetAsync(new RaionSpec(name), cancellationToken);
+        var entity = await _repository.GetAsync(new RaionSpec(id), cancellationToken);
 
         if (entity != null) // Verify if the raion is not found, you cannot update an non-existing entity.
         {

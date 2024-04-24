@@ -82,7 +82,7 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     /// </summary>
     [Authorize]
     [HttpPut] // This attribute will make the controller respond to a HTTP PUT request on the route /api/Job/Update.
-    public async Task<ActionResult<RequestResponse>> Update([FromBody] JobDTO job) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
+    public async Task<ActionResult<RequestResponse>> Update([FromBody] AddJobDTO job) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
     {
         var currentUser = await GetCurrentUser();
 
@@ -101,14 +101,34 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     /// Note that in the HTTP RFC you cannot have a body for DELETE operations.
     /// </summary>
     [Authorize]
-    [HttpDelete("{id:guid}")] // This attribute will make the controller respond to a HTTP DELETE request on the route /api/Job/Delete/<some_guid>.
-    public async Task<ActionResult<RequestResponse>> Delete([FromRoute] Guid id) // The FromRoute attribute will bind the id from the route to this parameter.
+    [HttpDelete] // This attribute will make the controller respond to a HTTP DELETE request on the route /api/Job/Delete/<some_guid>.
+    public async Task<ActionResult<RequestResponse>> DeleteByTitle([FromBody] DeleteJobDTO title) // The FromRoute attribute will bind the id from the route to this parameter.
     {
         var currentUser = await GetCurrentUser();
 
         if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.DeleteJob(id)) :
+            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.DeleteJobByTitle(title)) :
+                                                this.ErrorMessageResult(currentUser.Error);
+        }
+        else
+        {
+            return this.ErrorMessageResult();
+        }
+    }
+
+    /// <summary>
+    /// Note that in the HTTP RFC you cannot have a body for DELETE operations.
+    /// </summary>
+    [Authorize]
+    [HttpDelete("{id:guid}")] // This attribute will make the controller respond to a HTTP DELETE request on the route /api/Job/Delete/<some_guid>.
+    public async Task<ActionResult<RequestResponse>> DeleteById([FromRoute] Guid id) // The FromRoute attribute will bind the id from the route to this parameter.
+    {
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        {
+            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.DeleteJobById(id)) :
                                                 this.ErrorMessageResult(currentUser.Error);
         }
         else

@@ -7,8 +7,8 @@ namespace MobyLabWebProgramming.Core.DataTransferObjects;
 /// Note that it doesn't contain a password property and that is why you should use DTO rather than entities to use only the data that you need or protect sensible information.
 /// </summary>
 public class UpdateRaionDTO
-{   
-    public string OldName { get; set; } = default!;
+{
+    public Guid id { get; set; } = Guid.Empty;
     public string NewName { get; set; } = default!;
     public Guid SefRaionId { get; set; }
 }

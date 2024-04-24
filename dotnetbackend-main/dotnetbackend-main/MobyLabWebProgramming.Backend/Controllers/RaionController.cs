@@ -127,14 +127,14 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     /// Note that in the HTTP RFC you cannot have a body for DELETE operations.
     /// </summary>
     [Authorize]
-    [HttpDelete("{name}")] // This attribute will make the controller respond to a HTTP DELETE request on the route /api/Job/Delete/<some_guid>.
-    public async Task<ActionResult<RequestResponse>> Delete([FromRoute] string name) // The FromRoute attribute will bind the id from the route to this parameter.
+    [HttpDelete("{id:guid}")] // This attribute will make the controller respond to a HTTP DELETE request on the route /api/Job/Delete/<some_guid>.
+    public async Task<ActionResult<RequestResponse>> Delete([FromRoute] Guid id) // The FromRoute attribute will bind the id from the route to this parameter.
     {
         var currentUser = await GetCurrentUser();
 
         if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.DeleteRaion(name)) :
+            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.DeleteRaion(id)) :
                                                 this.ErrorMessageResult(currentUser.Error);
         }
         else

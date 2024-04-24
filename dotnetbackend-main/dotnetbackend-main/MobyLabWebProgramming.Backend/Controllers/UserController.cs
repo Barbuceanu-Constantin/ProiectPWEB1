@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
+using MobyLabWebProgramming.Core.Enums;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -36,8 +37,11 @@ public class UserController : AuthorizedController // Here we use the Authorized
 
         userDetails.Result.Result.Salary = currentUser.Result.Salary;
         userDetails.Result.Result.Commission = currentUser.Result.Commission;
-        userDetails.Result.Result.SalMin = jobDetails.Result.Result.Sal_min;
-        userDetails.Result.Result.SalMax = jobDetails.Result.Result.Sal_max;
+        if (currentUser.Result.Role != UserRoleEnum.Client)
+        {
+            userDetails.Result.Result.SalMin = jobDetails.Result.Result.Sal_min;
+            userDetails.Result.Result.SalMax = jobDetails.Result.Result.Sal_max;
+        }
 
         return this.FromServiceResponse(userDetails.Result);
     }

@@ -88,13 +88,12 @@ public class JobService : IJobService
     /// <summary>
     /// UpdateJob updates a job
     /// </summary>
-    public async Task<ServiceResponse> UpdateJob(JobDTO job, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> UpdateJob(AddJobDTO job, CancellationToken cancellationToken = default)
     {
-        var entity = await _repository.GetAsync(new JobSpec(job.Id), cancellationToken);
+        var entity = await _repository.GetAsync(new JobSpec(job.Title), cancellationToken);
 
         if (entity != null) // Verify if the job is not found, you cannot update an non-existing entity.
         {
-            entity.Title = job.Title ?? entity.Title;
             entity.Sal_max = job.Sal_max;
             entity.Sal_min = job.Sal_min;
 
@@ -107,7 +106,22 @@ public class JobService : IJobService
     /// <summary>
     /// DeleteJob deletes a job
     /// </summary>
-    public async Task<ServiceResponse> DeleteJob(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> DeleteJobByTitle(DeleteJobDTO title, CancellationToken cancellationToken = default)
+    {
+        var entity = await _repository.GetAsync(new JobSpecThird(title.Title), cancellationToken);
+
+        if (entity != null)
+        {
+            await _repository.DeleteAsync<Job>(entity.id, cancellationToken); // Delete the entity.
+        }
+
+        return entity != null ? ServiceResponse.ForSuccess() :
+                                ServiceResponse.FromError(CommonErrors.JobFailDelete);
+    }
+    /// <summary>
+    /// DeleteJob deletes a job
+    /// </summary>
+    public async Task<ServiceResponse> DeleteJobById(Guid id, CancellationToken cancellationToken = default)
     {
         var entity = await _repository.GetAsync(new JobSpec(id), cancellationToken);
 

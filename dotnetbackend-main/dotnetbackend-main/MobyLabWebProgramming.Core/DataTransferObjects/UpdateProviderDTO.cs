@@ -8,7 +8,7 @@ namespace MobyLabWebProgramming.Core.DataTransferObjects;
 /// </summary>
 public class UpdateProviderDTO
 {
-    public string OldName { get; set; } = default!;
+    public Guid id { get; set; } = Guid.Empty;
     public string NewName { get; set; } = default!;
     public string NewCountryOfOrigin { get; set; } = default!;
 }

@@ -11,5 +11,5 @@ public interface IProviderService
     public Task<ServiceResponse> AddProvider(AddProviderDTO provider, CancellationToken cancellationToken = default);
     public Task<ServiceResponse> UpdateProvider(UpdateProviderDTO provider, CancellationToken cancellationToken = default);
     public Task<ServiceResponse> UpdateProviderRaioaneList(UpdateRaionProvidersListDTO provider, CancellationToken cancellationToken = default);
-    public Task<ServiceResponse> DeleteProvider(string name, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse> DeleteProvider(Guid id, CancellationToken cancellationToken = default);
 }

@@ -68,7 +68,7 @@ public class ProviderService : IProviderService
 
     public async Task<ServiceResponse> UpdateProvider(UpdateProviderDTO provider, CancellationToken cancellationToken = default)
     {
-        var entity = await _repository.GetAsync(new ProviderSpec(provider.OldName), cancellationToken);
+        var entity = await _repository.GetAsync(new ProviderSpec(provider.id), cancellationToken);
 
         if (entity != null) // Verify if the raion is not found, you cannot update an non-existing entity.
         {
@@ -103,9 +103,9 @@ public class ProviderService : IProviderService
                                                                  ServiceResponse.FromError(CommonErrors.ProviderFailUpdate);
     }
 
-    public async Task<ServiceResponse> DeleteProvider(string name, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse> DeleteProvider(Guid id, CancellationToken cancellationToken = default)
     {
-        var entity = await _repository.GetAsync(new ProviderSpec(name), cancellationToken);
+        var entity = await _repository.GetAsync(new ProviderSpec(id), cancellationToken);
 
         if (entity != null) // Verify if the raion is not found, you cannot update an non-existing entity.
         {
