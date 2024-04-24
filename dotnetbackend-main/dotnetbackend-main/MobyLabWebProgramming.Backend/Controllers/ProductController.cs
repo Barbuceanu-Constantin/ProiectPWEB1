@@ -97,8 +97,10 @@ public class ProductController : AuthorizedController // Here we use the Authori
     public async Task<ActionResult<RequestResponse>> Update([FromBody] UpdateProductDTO product) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
     {
         var currentUser = await GetCurrentUser();
+        var raion = _raionService.GetRaion(product.RaionId).Result;
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
+        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+            && currentUser.Result.Id == raion.Result.SefRaionId)
         {
             return currentUser.Result != null ? this.FromServiceResponse(await _productService.UpdateProduct(product)) :
                                                 this.ErrorMessageResult();

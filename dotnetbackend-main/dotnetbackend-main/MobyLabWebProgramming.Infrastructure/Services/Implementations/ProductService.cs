@@ -75,7 +75,7 @@ public class ProductService : IProductService
 
     public async Task<ServiceResponse> UpdateProduct(UpdateProductDTO product, CancellationToken cancellationToken = default)
     {
-        var entity = await _repository.GetAsync(new ProductSpec(product.OldName), cancellationToken);
+        var entity = await _repository.GetAsync(new ProductSpec(product.id), cancellationToken);
 
         if (entity != null)
         {
@@ -84,8 +84,8 @@ public class ProductService : IProductService
             entity.Warranty = product.Warranty ?? entity.Warranty;
             entity.Price = product.Price != 0 ? product.Price : entity.Price;
             entity.Quantity = product.Quantity != 0 ? product.Quantity : entity.Quantity;
-            entity.RaionId = product.RaionId != entity.RaionId ? product.RaionId : entity.RaionId;
-            entity.ProviderId = product.ProviderId != entity.ProviderId ? product.ProviderId : entity.RaionId;
+            entity.RaionId = product.RaionId;
+            entity.ProviderId = product.ProviderId;
 
             await _repository.UpdateAsync(entity, cancellationToken); // Update the entity and persist the changes.
         }
@@ -100,7 +100,7 @@ public class ProductService : IProductService
 
         if (entity != null)
         {
-            await _repository.DeleteAsync<Order>(entity.Id, cancellationToken); // Delete the entity.
+            await _repository.DeleteAsync<Product>(entity.Id, cancellationToken); // Delete the entity.
         }
 
         return entity != null ? ServiceResponse.ForSuccess() :

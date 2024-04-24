@@ -8,7 +8,7 @@ namespace MobyLabWebProgramming.Core.DataTransferObjects;
 /// </summary>
 public class UpdateProductDTO
 {
-    public string OldName { get; set; } = default!;
+    public Guid id { get; set; } = Guid.Empty;
     public string NewName { get; set; } = default!;
     public string Description { get; set; } = default!;
     public string Warranty { get; set; } = default!;
