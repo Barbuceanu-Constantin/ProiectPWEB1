@@ -7,5 +7,4 @@ public class PaymentDTO
     public Guid Id { get; set; }
     public Guid OrderId { get; set; }
     public string PaymentMethod { get; set; } = default!;
-    public float TotalPrice { get; set; } = default!;
 }

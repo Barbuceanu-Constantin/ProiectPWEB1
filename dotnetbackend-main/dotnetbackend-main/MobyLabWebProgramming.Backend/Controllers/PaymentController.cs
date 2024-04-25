@@ -99,6 +99,8 @@ public class PaymentController : AuthorizedController // Here we use the Authori
     [HttpPut] // This attribute will make the controller respond to a HTTP PUT request on the route /api/Job/Update.
     public async Task<ActionResult<RequestResponse>> Update([FromBody] PaymentDTO payment) // The FromBody attribute indicates that the parameter is deserialized from the JSON body.
     {
+        //Doar adminul are voie update pentru ca odata ce tranzactia
+        //e facuta clientul nu mai poate modifica metoda de plata.
         var currentUser = await GetCurrentUser();
 
         if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)

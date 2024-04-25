@@ -43,6 +43,8 @@ public class UserController : AuthorizedController // Here we use the Authorized
             userDetails.Result.Result.SalMax = jobDetails.Result.Result.Sal_max;
         }
 
+        userDetails.Result.Result.Role = userDetails.Result.Result.Role.Split(",")[0].Substring(9).Trim('\\').Trim('\"');
+
         return this.FromServiceResponse(userDetails.Result);
     }
 
@@ -111,20 +113,16 @@ public class UserController : AuthorizedController // Here we use the Authorized
     /// <summary>
     /// This method implements the Create operation (C from CRUD) of a user. 
     /// </summary>
-    [Authorize] ///Aici am facut modificarea cand am vorbit cu el. Acum am refacut cum era.
+    //Aici am scos Authorize pentru ca un client trebuie sa se poata inregistra fara sa fie autorizat.
     [HttpPost("AddClient")] // This attribute will make the controller respond to a HTTP POST request on the route /api/User/Add.
     public async Task<ActionResult<RequestResponse>> Add([FromBody] UserAddClientDTO user)
     {
         var currentUser = await GetCurrentUser();
         user.Password = PasswordUtils.HashPassword(user.Password);
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
-        {
-            return currentUser.Result != null ? this.FromServiceResponse(await UserService.AddClientUser(user, null)) :
-                                                this.ErrorMessageResult(currentUser.Error);
-        }
+        return currentUser.Result != null ? this.FromServiceResponse(await UserService.AddClientUser(user, null)) :
+                                            this.ErrorMessageResult(currentUser.Error);
 
-        return this.ErrorMessageResult(currentUser.Error);
     }
 
     /// <summary>
