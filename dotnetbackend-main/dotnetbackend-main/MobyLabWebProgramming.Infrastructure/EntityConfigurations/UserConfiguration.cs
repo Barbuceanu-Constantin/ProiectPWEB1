@@ -16,9 +16,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.Id)     // This specifies which property is configured.
             .IsRequired();              // Here it is specified if the property is required, meaning it cannot be null in the database.
         builder.HasKey(x => x.Id);      // Here it is specifies that the property Id is the primary key.
+        
         builder.Property(e => e.Name)
             .HasMaxLength(255)          // This specifies the maximum length for varchar type in the database.
             .IsRequired();
+        builder.HasIndex(e => e.Name).IsUnique(); //Added. This way it works to be modified not like HasAlternateKey.
+
         builder.Property(e => e.Email)
             .HasMaxLength(255)
             .IsRequired();
@@ -30,6 +33,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(e => e.PhoneNumber)
             .HasMaxLength(20)
             .IsRequired(false);
+
         builder.Property(e => e.HireDate)
             .HasMaxLength(50)
             .IsRequired(false);

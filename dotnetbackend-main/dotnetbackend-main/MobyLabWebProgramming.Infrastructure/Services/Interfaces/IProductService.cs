@@ -6,7 +6,8 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Interfaces;
 
 public interface IProductService
 {
-    public Task<ServiceResponse<ProductDTO>> GetProduct(Guid id, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse<ProductDTO>> GetProductById(Guid id, CancellationToken cancellationToken = default);
+    public Task<ServiceResponse<ProductDTO>> GetProductByName(string name, CancellationToken cancellationToken = default);
     public Task<ServiceResponse<PagedResponse<ProductDTO>>> GetProducts(PaginationSearchQueryParams pagination, CancellationToken cancellationToken = default);
     public Task<ServiceResponse> AddProduct(AddProductDTO provider, CancellationToken cancellationToken = default);
     public Task<ServiceResponse> UpdateProduct(UpdateProductDTO provider, CancellationToken cancellationToken = default);

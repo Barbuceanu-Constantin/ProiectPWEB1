@@ -29,9 +29,18 @@ public class ProductService : IProductService
         _repository = repository;
     }
 
-    public async Task<ServiceResponse<ProductDTO>> GetProduct(Guid id, CancellationToken cancellationToken = default)
+    public async Task<ServiceResponse<ProductDTO>> GetProductById(Guid id, CancellationToken cancellationToken = default)
     {
         var result = await _repository.GetAsync(new ProductProjectionSpec(id), cancellationToken); // Get a raion using a specification on the repository.
+
+        return result != null ?
+            ServiceResponse<ProductDTO>.ForSuccess(result) :
+            ServiceResponse<ProductDTO>.FromError(CommonErrors.ProductFailGet); // Pack the result or error into a ServiceResponse.
+    }
+
+    public async Task<ServiceResponse<ProductDTO>> GetProductByName(string name, CancellationToken cancellationToken = default)
+    {
+        var result = await _repository.GetAsync(new ProductProjectionSpec(name), cancellationToken); // Get a raion using a specification on the repository.
 
         return result != null ?
             ServiceResponse<ProductDTO>.ForSuccess(result) :

@@ -8,6 +8,8 @@ namespace MobyLabWebProgramming.Core.Errors;
 public static class CommonErrors
 {
     public static ErrorMessage UserNotFound => new(HttpStatusCode.NotFound, "User doesn't exist!", ErrorCodes.EntityNotFound);
+    public static ErrorMessage UserFailGet => new(HttpStatusCode.NotFound, "User failed to be get!", ErrorCodes.EntityNotFound);
+
     public static ErrorMessage JobFailGet => new(HttpStatusCode.NotFound, "Job failed to be get!", ErrorCodes.EntityNotFound);
     public static ErrorMessage RaionFailGet => new(HttpStatusCode.NotFound, "Raion failed to be get!", ErrorCodes.EntityNotFound);
     public static ErrorMessage ProviderFailGet => new(HttpStatusCode.NotFound, "Provider failed to be get!", ErrorCodes.EntityNotFound);

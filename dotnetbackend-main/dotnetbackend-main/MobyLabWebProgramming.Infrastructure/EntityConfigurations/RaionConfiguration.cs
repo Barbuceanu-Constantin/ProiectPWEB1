@@ -13,6 +13,7 @@ public class RaionConfiguration : IEntityTypeConfiguration<Raion>
         builder.HasKey(x => x.Id);
 
         builder.Property(e => e.Name).HasMaxLength(50).IsRequired();
+        builder.HasIndex(e => e.Name).IsUnique(); //Added. This way it works to be modified not like HasAlternateKey.
 
         //Foreign_keys  
         builder.HasOne(r => r.User)

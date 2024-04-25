@@ -20,6 +20,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(e => e.Name)
             .HasMaxLength(100)
             .IsRequired();
+        builder.HasIndex(e => e.Name).IsUnique(); //Added. This way it works to be modified not like HasAlternateKey.
+
         builder.Property(e => e.Description)
             .HasMaxLength(50)
             .IsRequired(false);

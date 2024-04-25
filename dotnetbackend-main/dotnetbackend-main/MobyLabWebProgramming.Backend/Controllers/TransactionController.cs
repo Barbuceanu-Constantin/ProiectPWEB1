@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
+using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -40,23 +41,48 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            var task = _transactionService.GetTransaction(id).Result;
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                var task = _transactionService.GetTransaction(id).Result;
 
-            return task.Result != null ? this.FromServiceResponse(await _transactionService.GetTransaction(id)) :
-                                         this.ErrorMessageResult<TransactionDTO>(task.Error);
-        }
-        else
+                return task.Result != null ? this.FromServiceResponse(await _transactionService.GetTransaction(id)) :
+                                             this.ErrorMessageResult<TransactionDTO>(task.Error);
+            }
+            else
+            {
+                var task = _transactionService.GetTransaction(id).Result;
+
+                if (task.Result != null)
+                {
+                    var order = _orderService.GetOrder(task.Result.OrderId).Result;
+
+                    if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                        if (order.Result != null)
+                        {
+                            if (currentUser.Result.Id == order.Result.ClientId)
+                                return this.FromServiceResponse(await _transactionService.GetTransaction(id));
+                            else
+                            {
+                                return this.ErrorMessageResult<TransactionDTO>(task.Error);
+                            }
+                        } else
+                        {
+                            return this.ErrorMessageResult<TransactionDTO>(CommonErrors.TransactionFailGet);
+                        }
+                    else
+                    {
+                        return this.ErrorMessageResult<TransactionDTO>(CommonErrors.TransactionFailGet);
+                    }
+                }
+                else
+                {
+                    return this.ErrorMessageResult<TransactionDTO>(CommonErrors.TransactionFailGet);
+                }
+            }
+        } else
         {
-            var task = _transactionService.GetTransaction(id).Result;
-            var order = _orderService.GetOrder(task.Result.OrderId).Result;
-
-            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
-                if (currentUser.Result.Id == order.Result.ClientId)
-                    return task.Result != null ? this.FromServiceResponse(await _transactionService.GetTransaction(id)) :
-                                                 this.ErrorMessageResult<TransactionDTO>(task.Error);
-
             return this.ErrorMessageResult<TransactionDTO>();
         }
     }
@@ -67,10 +93,16 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactions(pagination)) :
-                                                this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactions(pagination)) :
+                                                    this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<TransactionDTO>>(CommonErrors.TransactionFailGet);
+            }
         }
         else
         {
@@ -84,20 +116,33 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId)) :
-                                                this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
-        }
-        else
-        {
-            var order = _orderService.GetOrder(orderId).Result;
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId)) :
+                                                    this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+            }
+            else
+            {
+                var order = _orderService.GetOrder(orderId).Result;
 
-            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
-                if (order.Result.ClientId == currentUser.Result.Id)
-                    return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId)) :
-                                                        this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
-            
+                if (order.Result != null)
+                {
+                    if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                        if (order.Result.ClientId == currentUser.Result.Id)
+                            return this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId));
+                        else
+                            return this.ErrorMessageResult<PagedResponse<TransactionDTO>>(CommonErrors.TransactionFailGet);
+                    else
+                        return this.ErrorMessageResult<PagedResponse<TransactionDTO>>(CommonErrors.TransactionFailGet);
+                } else
+                {
+                    return this.ErrorMessageResult<PagedResponse<TransactionDTO>>(CommonErrors.TransactionFailGet);
+                }
+            }
+        } else
+        {
             return this.ErrorMessageResult<PagedResponse<TransactionDTO>>();
         }
     }
@@ -109,11 +154,10 @@ public class TransactionController : AuthorizedController // Here we use the Aut
         var currentUser = await GetCurrentUser();
         var order = _orderService.GetOrder(transaction.OrderId).Result;
 
-        if (currentUser != null && order != null)
+        if (currentUser.Result != null && order.Result != null)
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
                 if (order.Result.ClientId == currentUser.Result.Id)
-                    return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.AddTransaction(transaction)) :
-                                                        this.ErrorMessageResult();
+                    return this.FromServiceResponse(await _transactionService.AddTransaction(transaction));
 
         return this.ErrorMessageResult();
     }
@@ -127,10 +171,16 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.UpdateTransaction(transaction)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.UpdateTransaction(transaction)) :
+                                                    this.ErrorMessageResult();
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.TransactionFailUpdate);
+            }
         }
         else
         {
@@ -147,10 +197,16 @@ public class TransactionController : AuthorizedController // Here we use the Aut
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.DeleteTransaction(id)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.DeleteTransaction(id)) :
+                                                    this.ErrorMessageResult(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.TransactionFailDelete);
+            }
         }
         else
         {

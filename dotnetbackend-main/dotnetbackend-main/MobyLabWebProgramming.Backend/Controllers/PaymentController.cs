@@ -38,23 +38,33 @@ public class PaymentController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            var task = _paymentService.GetPayment(id).Result;
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                var task = _paymentService.GetPayment(id).Result;
 
-            return task.Result != null ? this.FromServiceResponse(await _paymentService.GetPayment(id)) :
-                                         this.ErrorMessageResult<PaymentDTO>(task.Error);
-        }
-        else
+                return this.FromServiceResponse(await _paymentService.GetPayment(id));
+            }
+            else
+            {
+                var task = _paymentService.GetPayment(id).Result;
+
+                if (task.Result != null)
+                {
+                    var order = _orderService.GetOrder(task.Result.OrderId).Result;
+
+
+                    if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                        if (order.Result != null && currentUser.Result.Id == order.Result.ClientId)
+                            return task.Result != null ? this.FromServiceResponse(await _paymentService.GetPayment(id)) :
+                                                         this.ErrorMessageResult<PaymentDTO>(task.Error);
+                }
+
+                return this.ErrorMessageResult<PaymentDTO>(CommonErrors.PaymentFailGet);
+            }
+        } else
         {
-            var task = _paymentService.GetPayment(id).Result;
-            var order = _orderService.GetOrder(task.Result.OrderId).Result;
-
-            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
-                if (currentUser.Result.Id == order.Result.ClientId)
-                    return task.Result != null ? this.FromServiceResponse(await _paymentService.GetPayment(id)) :
-                                                 this.ErrorMessageResult<PaymentDTO>(task.Error);
-
             return this.ErrorMessageResult<PaymentDTO>();
         }
     }
@@ -65,10 +75,15 @@ public class PaymentController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _paymentService.GetPayments(pagination)) :
-                                                this.ErrorMessageResult<PagedResponse<PaymentDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _paymentService.GetPayments(pagination));
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<PaymentDTO>>(CommonErrors.PaymentFailGet);
+            }
         }
         else
         {
@@ -81,10 +96,16 @@ public class PaymentController : AuthorizedController // Here we use the Authori
     public async Task<ActionResult<RequestResponse>> Add([FromBody] AddPaymentDTO payment)
     {
         var currentUser = await GetCurrentUser();
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _paymentService.AddPayment(payment)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                return this.FromServiceResponse(await _paymentService.AddPayment(payment));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.PaymentFailAdd);
+            }
         }
         else
         {
@@ -103,10 +124,15 @@ public class PaymentController : AuthorizedController // Here we use the Authori
         //e facuta clientul nu mai poate modifica metoda de plata.
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _paymentService.UpdatePayment(payment)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _paymentService.UpdatePayment(payment));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.PaymentFailUpdate);
+            }
         }
         else
         {
@@ -123,10 +149,15 @@ public class PaymentController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _paymentService.DeletePayment(id)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _paymentService.DeletePayment(id));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.PaymentFailDelete);
+            }
         }
         else
         {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
+using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -35,22 +36,28 @@ public class OrderController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            var task = _orderService.GetOrder(id).Result;
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                var task = _orderService.GetOrder(id).Result;
 
-            return task.Result != null ? this.FromServiceResponse(await _orderService.GetOrder(id)) :
-                                         this.ErrorMessageResult<OrderDTO>(task.Error);
+                return task.Result != null ? this.FromServiceResponse(await _orderService.GetOrder(id)) :
+                                             this.ErrorMessageResult<OrderDTO>(task.Error);
+            } else
+            {
+                var task = _orderService.GetOrder(id).Result;
+
+                if (task.Result != null)
+                    if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+                        if (currentUser.Result.Id == task.Result.ClientId)
+                            this.FromServiceResponse(await _orderService.GetOrder(id));
+
+                return this.ErrorMessageResult<OrderDTO>(CommonErrors.OrderFailGet);
+            }
         }
         else
         {
-            var task = _orderService.GetOrder(id).Result;
-
-            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
-                if (currentUser.Result.Id == task.Result.ClientId)
-                    return task.Result != null ? this.FromServiceResponse(await _orderService.GetOrder(id)) :
-                                                 this.ErrorMessageResult<OrderDTO>(task.Error);
-
             return this.ErrorMessageResult<OrderDTO>();
         }
     }
@@ -61,10 +68,15 @@ public class OrderController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _orderService.GetOrdersForAdmin(pagination)) :
-                                                this.ErrorMessageResult<PagedResponse<OrderDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _orderService.GetOrdersForAdmin(pagination));
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<OrderDTO>>(CommonErrors.OrderFailGet);
+            }
         }
         else
         {
@@ -78,10 +90,15 @@ public class OrderController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _orderService.GetOrdersForClient(pagination, currentUser.Result.Id)) :
-                                                this.ErrorMessageResult<PagedResponse<OrderDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                return this.FromServiceResponse(await _orderService.GetOrdersForClient(pagination, currentUser.Result.Id));
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<OrderDTO>>(CommonErrors.OrderFailGet);
+            }
         }
         else
         {
@@ -94,10 +111,16 @@ public class OrderController : AuthorizedController // Here we use the Authorize
     public async Task<ActionResult<RequestResponse>> Add([FromBody] AddOrderDTO order)
     {
         var currentUser = await GetCurrentUser();
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _orderService.AddOrder(order)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                return this.FromServiceResponse(await _orderService.AddOrder(order));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.OrderFailAdd);
+            }
         }
         else
         {
@@ -114,10 +137,15 @@ public class OrderController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _orderService.UpdateOrder(order)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _orderService.UpdateOrder(order));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.OrderFailUpdate);
+            }
         }
         else
         {
@@ -134,10 +162,15 @@ public class OrderController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _orderService.DeleteOrder(id)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _orderService.DeleteOrder(id));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.OrderFailDelete);
+            }
         }
         else
         {

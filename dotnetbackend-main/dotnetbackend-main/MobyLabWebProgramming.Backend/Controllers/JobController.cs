@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
+using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -34,11 +35,18 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     {
         var currentUser =  await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin) { 
-            var task = _jobService.GetJob(id).Result;
+        if (currentUser.Result != null) 
+        {
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                var task = _jobService.GetJob(id).Result;
 
-            return task.Result != null ? this.FromServiceResponse(await _jobService.GetJob(id)) :
-                                         this.ErrorMessageResult<JobDTO>(task.Error);
+                return task.Result != null ? this.FromServiceResponse(await _jobService.GetJob(id)) :
+                                             this.ErrorMessageResult<JobDTO>(task.Error);
+            } else
+            {
+                return this.ErrorMessageResult<JobDTO>(CommonErrors.JobFailGet);
+            }
         } else {
             return this.ErrorMessageResult<JobDTO>();
         }
@@ -51,10 +59,15 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.GetJobs(pagination)) :
-                                                this.ErrorMessageResult<PagedResponse<JobDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _jobService.GetJobs(pagination));
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<JobDTO>>(CommonErrors.JobFailGet);
+            }
         }
         else
         {
@@ -67,12 +80,19 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     public async Task<ActionResult<RequestResponse>> Add([FromBody] AddJobDTO job)
     {
         var currentUser = await GetCurrentUser();
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.AddJob(job)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _jobService.AddJob(job));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.JobFailAdd);
+            }
         }
-        else {
+        else
+        {
             return this.ErrorMessageResult();
         }
     }
@@ -86,10 +106,15 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.UpdateJob(job)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _jobService.UpdateJob(job));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.JobFailUpdate);
+            }
         }
         else
         {
@@ -106,10 +131,15 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.DeleteJobByTitle(title)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _jobService.DeleteJobByTitle(title));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.JobFailDelete);
+            }
         }
         else
         {
@@ -126,10 +156,15 @@ public class JobController : AuthorizedController // Here we use the AuthorizedC
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _jobService.DeleteJobById(id)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return this.FromServiceResponse(await _jobService.DeleteJobById(id));
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.JobFailDelete);
+            }
         }
         else
         {

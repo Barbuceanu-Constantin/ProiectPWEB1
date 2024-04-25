@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
+using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -34,13 +35,19 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
-            || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result != null)
         {
-            var task = _raionService.GetRaion(id).Result;
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+                || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                var task = _raionService.GetRaion(id).Result;
 
-            return task.Result != null ? this.FromServiceResponse(await _raionService.GetRaion(id)) :
-                                         this.ErrorMessageResult<RaionDTO>(task.Error);
+                return task.Result != null ? this.FromServiceResponse(await _raionService.GetRaion(id)) :
+                                             this.ErrorMessageResult<RaionDTO>(task.Error);
+            } else
+            {
+                return this.ErrorMessageResult<RaionDTO>(CommonErrors.RaionFailGet);
+            }
         }
         else
         {
@@ -55,11 +62,17 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
-            || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.GetRaioane(pagination)) :
-                                                this.ErrorMessageResult<PagedResponse<RaionDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+            || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.GetRaioane(pagination)) :
+                                                    this.ErrorMessageResult<PagedResponse<RaionDTO>>(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<RaionDTO>>(CommonErrors.RaionFailGet);
+            }
         }
         else
         {
@@ -72,10 +85,17 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     public async Task<ActionResult<RequestResponse>> Add([FromBody] AddRaionDTO raion)
     {
         var currentUser = await GetCurrentUser();
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.AddRaion(raion)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.AddRaion(raion)) :
+                                                    this.ErrorMessageResult();
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.RaionFailAdd);
+            }
         }
         else
         {
@@ -92,10 +112,16 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaion(raion)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaion(raion)) :
+                                                    this.ErrorMessageResult();
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.RaionFailUpdate);
+            }
         }
         else
         {
@@ -112,10 +138,17 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaionProvidersList(raion)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaionProvidersList(raion)) :
+                                                    this.ErrorMessageResult();
+            }
+            else
+            {
+                return this.ErrorMessageResult(CommonErrors.RaionFailUpdate);
+            }
         }
         else
         {
@@ -132,10 +165,16 @@ public class RaionController : AuthorizedController // Here we use the Authorize
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _raionService.DeleteRaion(id)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.DeleteRaion(id)) :
+                                                    this.ErrorMessageResult(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.RaionFailDelete);
+            }
         }
         else
         {

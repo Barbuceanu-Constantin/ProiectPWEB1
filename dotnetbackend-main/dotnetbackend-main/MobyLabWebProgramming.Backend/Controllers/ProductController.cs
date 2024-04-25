@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
+using MobyLabWebProgramming.Core.Errors;
 using MobyLabWebProgramming.Core.Requests;
 using MobyLabWebProgramming.Core.Responses;
 using MobyLabWebProgramming.Infrastructure.Authorization;
@@ -38,13 +39,45 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
-            || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result != null)
         {
-            var task = _productService.GetProduct(id).Result;
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+                || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                var task = _productService.GetProductById(id).Result;
 
-            return task.Result != null ? this.FromServiceResponse(await _productService.GetProduct(id)) :
-                                         this.ErrorMessageResult<ProductDTO>(task.Error);
+                return task.Result != null ? this.FromServiceResponse(await _productService.GetProductById(id)) :
+                                             this.ErrorMessageResult<ProductDTO>(task.Error);
+            } else
+            {
+                return this.ErrorMessageResult<ProductDTO>(CommonErrors.ProductFailGet);
+            }
+        }
+        else
+        {
+            return this.ErrorMessageResult<ProductDTO>();
+        }
+    }
+
+    [Authorize]// You need to use this attribute to protect the route access, it will return a Forbidden status code if the JWT is not present or invalid, and also it will decode the JWT token.
+    [HttpGet("{name}")] // This attribute will make the controller respond to a HTTP GET request on the route /api/Job/GetById/<some_guid>.
+    public async Task<ActionResult<RequestResponse<ProductDTO>>> GetByName([FromRoute] string name) // The FromRoute attribute will bind the id from the route to this parameter.
+    {
+        var currentUser = await GetCurrentUser();
+
+        if (currentUser.Result != null)
+        {
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+                || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                var task = _productService.GetProductByName(name).Result;
+
+                return task.Result != null ? this.FromServiceResponse(await _productService.GetProductByName(name)) :
+                                             this.ErrorMessageResult<ProductDTO>(task.Error);
+            } else
+            {
+                return this.ErrorMessageResult<ProductDTO>(CommonErrors.ProductFailGet);
+            }
         }
         else
         {
@@ -58,11 +91,17 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
-            || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _productService.GetProducts(pagination)) :
-                                                this.ErrorMessageResult<PagedResponse<ProductDTO>>(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+                || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _productService.GetProducts(pagination)) :
+                                                    this.ErrorMessageResult<PagedResponse<ProductDTO>>(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult<PagedResponse<ProductDTO>>(CommonErrors.ProductFailGet);
+            }
         }
         else
         {
@@ -77,11 +116,17 @@ public class ProductController : AuthorizedController // Here we use the Authori
         var currentUser = await GetCurrentUser();
         var raion = _raionService.GetRaion(product.RaionId).Result;
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
-            && currentUser.Result.Id == raion.Result.SefRaionId)
+        if (currentUser.Result != null && raion.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _productService.AddProduct(product)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+                && currentUser.Result.Id == raion.Result.SefRaionId)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _productService.AddProduct(product)) :
+                                                    this.ErrorMessageResult();
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.ProductFailAdd);
+            }
         }
         else
         {
@@ -99,11 +144,17 @@ public class ProductController : AuthorizedController // Here we use the Authori
         var currentUser = await GetCurrentUser();
         var raion = _raionService.GetRaion(product.RaionId).Result;
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
-            && currentUser.Result.Id == raion.Result.SefRaionId)
+        if (currentUser.Result != null && raion.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _productService.UpdateProduct(product)) :
-                                                this.ErrorMessageResult();
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
+                && currentUser.Result.Id == raion.Result.SefRaionId)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _productService.UpdateProduct(product)) :
+                                                    this.ErrorMessageResult();
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.ProductFailUpdate);
+            }
         }
         else
         {
@@ -120,10 +171,16 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(name)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(name)) :
+                                                    this.ErrorMessageResult(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.ProductFailDelete);
+            }
         }
         else
         {
@@ -140,10 +197,16 @@ public class ProductController : AuthorizedController // Here we use the Authori
     {
         var currentUser = await GetCurrentUser();
 
-        if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
+        if (currentUser.Result != null)
         {
-            return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(id)) :
-                                                this.ErrorMessageResult(currentUser.Error);
+            if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
+            {
+                return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(id)) :
+                                                    this.ErrorMessageResult(currentUser.Error);
+            } else
+            {
+                return this.ErrorMessageResult(CommonErrors.ProductFailDelete);
+            }
         }
         else
         {
