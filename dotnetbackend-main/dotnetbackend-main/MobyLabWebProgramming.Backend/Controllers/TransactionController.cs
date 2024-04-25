@@ -97,8 +97,7 @@ public class TransactionController : AuthorizedController // Here we use the Aut
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactions(pagination)) :
-                                                    this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+                return this.FromServiceResponse(await _transactionService.GetTransactions(pagination));
             } else
             {
                 return this.ErrorMessageResult<PagedResponse<TransactionDTO>>(CommonErrors.TransactionFailGet);
@@ -120,8 +119,7 @@ public class TransactionController : AuthorizedController // Here we use the Aut
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId)) :
-                                                    this.ErrorMessageResult<PagedResponse<TransactionDTO>>(currentUser.Error);
+                return this.FromServiceResponse(await _transactionService.GetTransactionsForOrder(pagination, orderId));
             }
             else
             {
@@ -175,8 +173,7 @@ public class TransactionController : AuthorizedController // Here we use the Aut
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.UpdateTransaction(transaction)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _transactionService.UpdateTransaction(transaction));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.TransactionFailUpdate);
@@ -201,8 +198,7 @@ public class TransactionController : AuthorizedController // Here we use the Aut
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _transactionService.DeleteTransaction(id)) :
-                                                    this.ErrorMessageResult(currentUser.Error);
+                return this.FromServiceResponse(await _transactionService.DeleteTransaction(id));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.TransactionFailDelete);

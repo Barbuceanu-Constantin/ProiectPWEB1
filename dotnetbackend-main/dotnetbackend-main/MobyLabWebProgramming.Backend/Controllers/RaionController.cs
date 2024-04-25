@@ -67,8 +67,7 @@ public class RaionController : AuthorizedController // Here we use the Authorize
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
             || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.GetRaioane(pagination)) :
-                                                    this.ErrorMessageResult<PagedResponse<RaionDTO>>(currentUser.Error);
+                return this.FromServiceResponse(await _raionService.GetRaioane(pagination));
             } else
             {
                 return this.ErrorMessageResult<PagedResponse<RaionDTO>>(CommonErrors.RaionFailGet);
@@ -90,8 +89,7 @@ public class RaionController : AuthorizedController // Here we use the Authorize
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.AddRaion(raion)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _raionService.AddRaion(raion));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.RaionFailAdd);
@@ -116,8 +114,7 @@ public class RaionController : AuthorizedController // Here we use the Authorize
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaion(raion)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _raionService.UpdateRaion(raion));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.RaionFailUpdate);
@@ -142,8 +139,7 @@ public class RaionController : AuthorizedController // Here we use the Authorize
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.UpdateRaionProvidersList(raion)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _raionService.UpdateRaionProvidersList(raion));
             }
             else
             {
@@ -169,8 +165,7 @@ public class RaionController : AuthorizedController // Here we use the Authorize
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _raionService.DeleteRaion(id)) :
-                                                    this.ErrorMessageResult(currentUser.Error);
+                return this.FromServiceResponse(await _raionService.DeleteRaion(id));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.RaionFailDelete);

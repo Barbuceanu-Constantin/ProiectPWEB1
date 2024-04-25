@@ -66,8 +66,7 @@ public class ProviderController : AuthorizedController // Here we use the Author
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
             || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _providerService.GetProviders(pagination)) :
-                                                    this.ErrorMessageResult<PagedResponse<ProviderDTO>>(currentUser.Error);
+                return this.FromServiceResponse(await _providerService.GetProviders(pagination));
             }
             else
             {
@@ -90,8 +89,7 @@ public class ProviderController : AuthorizedController // Here we use the Author
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _providerService.AddProvider(provider)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _providerService.AddProvider(provider));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProviderFailAdd);
@@ -116,8 +114,7 @@ public class ProviderController : AuthorizedController // Here we use the Author
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _providerService.UpdateProvider(provider)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _providerService.UpdateProvider(provider));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProviderFailUpdate);
@@ -142,8 +139,7 @@ public class ProviderController : AuthorizedController // Here we use the Author
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _providerService.UpdateProviderRaioaneList(provider)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _providerService.UpdateProviderRaioaneList(provider));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProviderFailUpdate);
@@ -168,8 +164,7 @@ public class ProviderController : AuthorizedController // Here we use the Author
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _providerService.DeleteProvider(id)) :
-                                                    this.ErrorMessageResult(currentUser.Error);
+                return this.FromServiceResponse(await _providerService.DeleteProvider(id));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProviderFailDelete);
