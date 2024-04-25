@@ -96,8 +96,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.Admin || currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
                 || currentUser.Result.Role == Core.Enums.UserRoleEnum.Client)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _productService.GetProducts(pagination)) :
-                                                    this.ErrorMessageResult<PagedResponse<ProductDTO>>(currentUser.Error);
+                return this.FromServiceResponse(await _productService.GetProducts(pagination));
             } else
             {
                 return this.ErrorMessageResult<PagedResponse<ProductDTO>>(CommonErrors.ProductFailGet);
@@ -121,8 +120,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
                 && currentUser.Result.Id == raion.Result.SefRaionId)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _productService.AddProduct(product)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _productService.AddProduct(product));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProductFailAdd);
@@ -149,8 +147,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion
                 && currentUser.Result.Id == raion.Result.SefRaionId)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _productService.UpdateProduct(product)) :
-                                                    this.ErrorMessageResult();
+                return this.FromServiceResponse(await _productService.UpdateProduct(product));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProductFailUpdate);
@@ -175,8 +172,7 @@ public class ProductController : AuthorizedController // Here we use the Authori
         {
             if (currentUser.Result.Role == Core.Enums.UserRoleEnum.ManagerRaion)
             {
-                return currentUser.Result != null ? this.FromServiceResponse(await _productService.DeleteProduct(name)) :
-                                                    this.ErrorMessageResult(currentUser.Error);
+                return this.FromServiceResponse(await _productService.DeleteProduct(name));
             } else
             {
                 return this.ErrorMessageResult(CommonErrors.ProductFailDelete);
